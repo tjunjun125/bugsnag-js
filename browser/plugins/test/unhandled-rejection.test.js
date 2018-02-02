@@ -94,13 +94,15 @@ describe('plugin: unhandled rejection', () => {
             expect(report.exceptions[0].errorClass).toBe('Error')
             expect(report.exceptions[0].message).toBe('blah')
             expect(report.severityReason).toEqual({ type: 'unhandledPromiseRejection' })
+            const reason = { 'stack': { '0': 'foo.js', '1': 'bar.js' } }
+            expect(report.metaData.promise['rejection reason']).toEqual(reason)
             plugin.destroy()
             done()
           }
         })
 
         const err = new Error('blah')
-        err.stack = true
+        err.stack = { '0': 'foo.js', '1': 'bar.js' }
         setTimeout(() => Promise.reject(err), 0) // eslint-disable-line
       })
     })
