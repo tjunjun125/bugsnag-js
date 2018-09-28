@@ -1,9 +1,7 @@
+import bugsnag from '@bugsnag/expo';
+const bugsnagClient = bugsnag('f35a2472bd230ac0ab0f52715bbdc65d');
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-
-const bugsnag = require('bugsnag-expo')({
-  apiKey: 'f35a2472bd230ac0ab0f52715bbdc65d'
-})
 
 export default class App extends React.Component {
   render() {
@@ -25,7 +23,7 @@ export default class App extends React.Component {
   }
 
   triggerHandledException() {
-    bugsnag.notify(new RangeError('A handled exception from JS'));
+    bugsnagClient.notify(new RangeError('A handled exception from JS'));
   }
 
   triggerUnhandledException() {

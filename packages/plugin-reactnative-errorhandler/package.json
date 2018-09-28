@@ -1,0 +1,22 @@
+{
+  "name": "@bugsnag/plugin-reactnative-errorhandler",
+  "version": "5.0.0-alpha.1",
+  "main": "errorhandler.js",
+  "description": "@bugsnag/js plugin to report unhandled exceptions in react native components",
+  "homepage": "https://www.bugsnag.com/",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bugsnag/bugsnag-js.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "*.js"
+  ],
+  "author": "Bugsnag",
+  "license": "MIT",
+  "devDependencies": {
+    "@bugsnag/core": "^5.0.0-alpha.1"
+  }
+}
