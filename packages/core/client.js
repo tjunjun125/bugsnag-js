@@ -88,7 +88,7 @@ class BugsnagClient {
   use (plugin, ...args) {
     if (!this._configured) throw new Error('client not configured')
     if (plugin.configSchema) this.configure(plugin.configSchema)
-    const result = plugin.init(this, ...args)
+    const result = plugin.init(this._proxy || this, ...args)
     // JS objects are not the safest way to store arbitrarily keyed values,
     // so bookend the key with some characters that prevent tampering with
     // stuff like __proto__ etc. (only store the result if the plugin had a

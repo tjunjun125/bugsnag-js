@@ -2,6 +2,7 @@ node_modules
 lerna-debug.log
 coverage
 .nyc_output
+.gradle
 dist
 .DS_Store
 maze_output
