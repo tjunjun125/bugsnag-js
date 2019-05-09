@@ -1,64 +1,8 @@
-require 'json'
-
-require_relative '../lib/browserstack_driver'
-
-BROWSER_STACK_URI = "https://api-cloud.browserstack.com/app-automate/upload"
-
-@bs_username = ENV['BROWSER_STACK_USERNAME']
-@bs_access_key = ENV['BROWSER_STACK_ACCESS_KEY']
-@bs_local_id = ENV['BROWSER_STACK_LOCAL_IDENTIFIER'] || 'mazzzzeee'
-
-@bs_app_url = nil
-
-$bs_driver = nil
-
-def device_type
-  ENV['DEVICE_TYPE']
-end
-
-def upload_app
-  res = `curl -u "#{@bs_username}:#{@bs_access_key}" -X POST "#{BROWSER_STACK_URI}" -F "file=@#{ENV['APP_LOCATION']}"`
-  resData = JSON.parse(res)
-  if resData.include?('error')
-    puts "BrowserStack upload failed due to error: #{resData['error']}"
-    exit(false)
-  else
-    @bs_app_url = resData['app_url']
-  end
-end
-
-def start_driver
-  unless $bs_driver
-    $bs_driver = BSAppAutomator::Driver.new(device_type, @bs_app_url, @bs_username, @bs_access_key, @bs_local_id)
-    $bs_driver.start_local
-    $bs_driver.start_driver
-  end
-end
-
-def wait_on_element(element)
-  unless $bs_driver.nil?
-    $bs_driver.wait_for_element(element)
-  end
-end
-
-def click_element(element)
-  unless $bs_driver.nil?
-    $bs_driver.click_element(element)
-  end
-end
-
-def timeout_app(timeout)
-  unless $bs_driver.nil?
-    $bs_driver.background_app(timeout)
-  end
-end
-
-def stop_driver
-  unless $bs_driver.nil?
-    $bs_driver.stop_driver
-    $bs_driver = nil
-  end
-end
+bs_username = ENV['BROWSER_STACK_USERNAME']
+bs_access_key = ENV['BROWSER_STACK_ACCESS_KEY']
+bs_local_id = ENV['BROWSER_STACK_LOCAL_IDENTIFIER'] || 'maze_expo_id'
+bs_device = ENV['DEVICE_TYPE']
+app_location = ENV['APP_LOCATION']
 
 FAILED_SCENARIO_OUTPUT_PATH = File.join(Dir.pwd, 'maze_output')
 
@@ -82,41 +26,27 @@ def write_failed_requests_to_disk(scenario)
   end
 end
 
-Before('@skip_android_5') do |scenario|
-  skip_this_scenario("Skipping scenario") if device_type == 'ANDROID_5'
-end
-
-Before('@skip_android_7') do |scenario|
-  skip_this_scenario("Skipping scenario") if device_type == 'ANDROID_7'
-end
-
-Before('@skip_android_8') do |scenario|
-  skip_this_scenario("Skipping scenario") if device_type == 'ANDROID_8'
-end
-
-# Reset the app between each run
 After do |scenario|
-  unless $bs_driver.nil?
-    $bs_driver.reset_app
-  end
   write_failed_requests_to_disk(scenario) if scenario.failed?
 end
 
-# Ensure the browserstack instance is stopped
-at_exit do
-  stop_driver
+Before('@skip_android_5') do |scenario|
+  skip_this_scenario("Skipping scenario") if $driver.device_type == 'ANDROID_5'
 end
 
-# Setup driver ready for tests
-unless @bs_username && @bs_access_key
-  puts "BrowserStack credentials not set-up correctly"
-  exit(false)
+Before('@skip_android_7') do |scenario|
+  skip_this_scenario("Skipping scenario") if $driver.device_type == 'ANDROID_7'
 end
 
-unless device_type
-  puts "Test device type not defined, exiting"
-  exit(false)
+Before('@skip_android_8') do |scenario|
+  skip_this_scenario("Skipping scenario") if $driver.device_type == 'ANDROID_8'
 end
 
-upload_app
-start_driver
+After do |_scenario|
+  $driver.reset_app unless $driver.nil?
+end
+
+AfterConfiguration do |config|
+  $driver = AppAutomateDriver.new(bs_username, bs_access_key, bs_local_id)
+  $driver.start_driver(bs_device, app_location)
+end
