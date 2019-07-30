@@ -5,7 +5,8 @@ steps:
       - docker-compose#v2.6.0:
           build: ci
           image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-          cache-from: ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-latest
+          cache-from:
+            - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-latest
       - docker-compose#v2.6.0:
           push:
             - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-latest
