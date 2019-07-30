@@ -14,7 +14,7 @@ This is a monorepo (managed with [Lerna](https://lernajs.io/)) containing our un
 
 Etc. See [packages](/packages) for a full list of contents.
 
-## Getting started
+## Getting started 
 
 1. [Create a Bugsnag account](https://www.bugsnag.com)
 2. Complete the instructions in the [integration guide](https://docs.bugsnag.com/platforms/javascript/)
