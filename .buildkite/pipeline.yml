@@ -9,7 +9,7 @@ steps:
             - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:latest-ci
       - docker-compose#v2.6.0:
           push:
-            - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:lastest-ci
+            - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:latest-ci
 
   - wait
 
