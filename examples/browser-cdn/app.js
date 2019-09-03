@@ -9,6 +9,7 @@
 
 document.getElementById('jsHandled').addEventListener('click', sendHandled)
 document.getElementById('jsUnhandled').addEventListener('click', sendUnhandled)
+document.getElementById('ajaxError').addEventListener('click', createAjaxError)
 
 // Note that Bugsnag was loaded with a CDN link in index.html, but it will not be
 // active until initialized, either in the html or here in the JavaScript.
@@ -17,7 +18,7 @@ document.getElementById('jsUnhandled').addEventListener('click', sendUnhandled)
 // here are some other helpful configuration details:
 var bugsnagClient = bugsnag({
   // get your own api key at bugsnag.com
-  apiKey: '6eccabc796ef28a154314498f79b724e',
+  apiKey: '1b01d01faa5c86d2e6e3dce5bb3f9033',
 
   // if you track deploys or use source maps, make sure to set the correct version.
   appVersion: '1.2.3',
@@ -98,6 +99,37 @@ function sendUnhandled () {
   // deliberate Type Error
   num.toUpperCase()
 }
+
+
+function createAjaxError(){
+
+console.log('creating ajax error');
+$( "div.result" ).load( "ajax/missing.html" );
+
+}
+
+
+$(document).ajaxError(function () {
+
+console.log('preparing ajax error notify');
+
+                                bugsnagClient.notify(
+                                    new Error("Ajax Error"),
+                                        {
+                                            beforeSend: function (report) {
+                                                report.updateMetaData('AjaxLog', {
+                                                    'type': getnothing(),
+                                                    'site': "site",
+                                                    'spinner': "state",
+                                                    'url': "url",
+                                                    'tries': "tries"
+                                                })
+                                            }
+                                        }
+                                );
+console.log('an ajax error has been reported to your Bugsnag dashboard');
+});
+
 
 // below is the simplest notification syntax, akin to logging.
 window.bugsnagClient.notify('End of file')
