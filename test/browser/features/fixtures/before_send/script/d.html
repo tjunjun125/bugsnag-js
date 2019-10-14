@@ -16,7 +16,7 @@
     <script>
       bugsnagClient.notify(new Error('before send does work'), {
         beforeSend: function (report) {
-          report.updateMetaData('before_send', 'notify_opts', 'works')
+          report.addMetadata('before_send', 'notify_opts', 'works')
         }
       })
     </script>

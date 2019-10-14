@@ -184,7 +184,7 @@ Lorem ipsum dolor sit amet.
 
     expect(client.config.beforeSend.length).toBe(1)
     client.delivery(client => ({ sendReport: (payload) => payloads.push(payload) }))
-    const spy = spyOn(client._logger, 'error')
+    const spy = spyOn(client.__logger, 'error')
     client.notify(new Report('EmptyStacktrace', 'Has nothing in it', []))
     expect(payloads.length).toEqual(1)
     expect(payloads[0].events[0].stacktrace).toEqual([])

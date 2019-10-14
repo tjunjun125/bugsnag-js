@@ -44,8 +44,8 @@ declare class Report {
 
   public isIgnored(): boolean;
   public ignore(): void;
-  public updateMetaData(section: string, value: object): Report;
-  public updateMetaData(section: string, property: string, value: object): Report;
+  public addMetadata(section: string, value: object): Report;
+  public addMetadata(section: string, property: string, value: object): Report;
   public removeMetaData(section: string, property: string): Report;
 }
 

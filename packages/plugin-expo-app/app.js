@@ -33,7 +33,7 @@ module.exports = {
       if (inForeground) {
         report.app.durationInForeground = now - lastEnteredForeground
       }
-      report.updateMetaData('app', { nativeBundleVersion, nativeVersionCode })
+      report.addMetadata('app', { nativeBundleVersion, nativeVersionCode })
     })
 
     if (!client.app.version && Constants.manifest.version) {

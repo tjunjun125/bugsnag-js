@@ -1,56 +1,45 @@
 const config = require('./config')
-const BugsnagReport = require('./report')
-const BugsnagBreadcrumb = require('./breadcrumb')
-const BugsnagSession = require('./session')
+const Event = require('./event')
+const Session = require('./session')
+const Breadcrumb = require('./breadcrumb')
 const { map, includes, isArray } = require('./lib/es-utils')
-const inferReleaseStage = require('./lib/infer-release-stage')
 const isError = require('./lib/iserror')
 const some = require('./lib/async-some')
-const runBeforeSend = require('./lib/run-before-send')
+const createCallbackRunner = require('./lib/run-on-error-callbacks')
+const noop = () => {}
+const metadataDelegate = require('./lib/metadata-delegate')
 
 const LOG_USAGE_ERR_PREFIX = `Usage error.`
 const REPORT_USAGE_ERR_PREFIX = `Bugsnag usage error.`
 
 class BugsnagClient {
-  constructor (notifier) {
-    if (!notifier || !notifier.name || !notifier.version || !notifier.url) {
-      throw new Error('`notifier` argument is required')
-    }
-
-    // notifier id
-    this.notifier = notifier
-
-    // configure() should be called before notify()
-    this._configured = false
+  constructor (configuration, schema = config.schema, notifier) {
+    this._notifier = notifier
 
     // intialise opts and config
-    this._opts = {}
-    this.config = {}
+    this._opts = configuration
+    this._config = {}
+    this._schema = schema
 
-    // // i/o
-    this._delivery = { sendSession: () => {}, sendReport: () => {} }
-    this._logger = { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} }
-
-    // plugins
-    this._plugins = {}
+    this.__delivery = { sendSession: noop, sendEvent: noop }
+    this.__logger = { debug: noop, info: noop, warn: noop, error: noop }
+    this.__sessionDelegate = { startSession: noop, pauseSession: noop, resumeSession: noop }
 
     this._session = null
+    this._breadcrumbs = []
+    this._context = undefined
+    this._metadata = {}
+    this._user = {}
 
-    this.breadcrumbs = []
+    this._callbacks = {
+      onError: [],
+      onSession: [],
+      onBreadcrumb: []
+    }
 
-    // setable props
-    this.app = {}
-    this.context = undefined
-    this.device = undefined
-    this.metaData = undefined
-    this.request = undefined
-    this.user = {}
+    this._plugins = {}
 
-    // expose internal constructors
-    this.BugsnagClient = BugsnagClient
-    this.BugsnagReport = BugsnagReport
-    this.BugsnagBreadcrumb = BugsnagBreadcrumb
-    this.BugsnagSession = BugsnagSession
+    this._extractConfiguration()
 
     var self = this
     var notify = this.notify
@@ -59,35 +48,56 @@ class BugsnagClient {
     }
   }
 
-  setOptions (opts) {
-    this._opts = { ...this._opts, ...opts }
+  addMetadata (section, ...args) {
+    return metadataDelegate.add.call(this, section, ...args)
   }
 
-  configure (partialSchema = config.schema) {
+  getMetadata (section, key) {
+    return metadataDelegate.get.call(this, section, key)
+  }
+
+  clearMetadata (section, key) {
+    return metadataDelegate.clear.call(this, section, key)
+  }
+
+  getContext () {
+    return this._context
+  }
+
+  setContext (c) {
+    this._context = c
+  }
+
+  getUser () {
+    return this._user
+  }
+
+  setUser (id, name, email) {
+    this._user = { id, name, email }
+  }
+
+  clearUser () {
+    this._user = {}
+  }
+
+  _extractConfiguration (partialSchema = this._schema) {
     const conf = config.mergeDefaults(this._opts, partialSchema)
     const validity = config.validate(conf, partialSchema)
 
     if (!validity.valid === true) throw new Error(generateConfigErrorMessage(validity.errors))
 
-    // update and elevate some special options if they were passed in at this point
-    if (typeof conf.beforeSend === 'function') conf.beforeSend = [ conf.beforeSend ]
-    if (conf.appVersion) this.app.version = conf.appVersion
-    if (conf.appType) this.app.type = conf.appType
-    if (conf.metaData) this.metaData = conf.metaData
-    if (conf.user) this.user = conf.user
-    if (conf.logger) this.logger(conf.logger)
+    if (typeof conf.onError === 'function') conf.onError = [ conf.onError ]
+    if (conf.onError && conf.onError.length) this._callbacks.onError = conf.onError
+    if (conf.logger) this._logger(conf.logger)
 
     // merge with existing config
-    this.config = { ...this.config, ...conf }
-
-    this._configured = true
+    this._config = { ...this._config, ...conf }
 
     return this
   }
 
   use (plugin, ...args) {
-    if (!this._configured) throw new Error('client not configured')
-    if (plugin.configSchema) this.configure(plugin.configSchema)
+    if (plugin.configSchema) this._extractConfiguration(plugin.configSchema)
     const result = plugin.init(this, ...args)
     // JS objects are not the safest way to store arbitrarily keyed values,
     // so bookend the key with some characters that prevent tampering with
@@ -101,132 +111,184 @@ class BugsnagClient {
     return this._plugins[`~${name}~`]
   }
 
-  delivery (d) {
-    this._delivery = d(this)
+  _delivery (d) {
+    this.__delivery = d(this)
     return this
   }
 
-  logger (l, sid) {
-    this._logger = l
+  _logger (l, sid) {
+    this.__logger = l
     return this
   }
 
-  sessionDelegate (s) {
-    this._sessionDelegate = s
+  _sessionDelegate (s) {
+    this.__sessionDelegate = s
     return this
   }
 
   startSession () {
-    if (!this._sessionDelegate) {
-      this._logger.warn('No session implementation is installed')
+    const session = new Session()
+    session._app.version = this._config.appVersion
+    session._app.releaseStage = this._config.releaseStage
+    session._app.type = this._config.releaseStage
+
+    // run synchronous onSession callbacks
+    let ignore = false
+    const cbs = this._callbacks.onSession.slice(0)
+    while (!ignore) {
+      if (!cbs.length) {
+        break
+      }
+      try {
+        ignore = cbs.pop()(session) === false
+      } catch (e) {
+        this.__logger.error(`Error occurred in onSession callback, continuing anyway…`)
+        this.__logger.error(e)
+      }
+    }
+    if (ignore) {
+      this.__logger.debug(`Session not started due to onSession callback`)
       return this
     }
-    return this._sessionDelegate.startSession(this)
+    return this.__sessionDelegate.startSession(this, session)
   }
 
-  leaveBreadcrumb (name, metaData, type, timestamp) {
-    if (!this._configured) throw new Error('client not configured')
+  pauseSession () {
+    return this.__sessionDelegate.pauseSession(this)
+  }
 
+  resumeSession () {
+    return this.__sessionDelegate.resumeSession(this)
+  }
+
+  addOnError (fn) {
+    this._callbacks.onError.push(fn)
+  }
+
+  // TODO: add removeOnError
+
+  addOnSession (fn) {
+    this._callbacks.onSession.push(fn)
+  }
+
+  // TODO: add removeOnSession
+
+  addOnBreadcrumb (fn) {
+    this._callbacks.onBreadcrumb.push(fn)
+  }
+
+  // TODO: add removeOnBreadcrumb
+
+  leaveBreadcrumb (message, metadata, type, timestamp) {
     // coerce bad values so that the defaults get set
-    name = name || undefined
+    message = message || undefined
     type = typeof type === 'string' ? type : undefined
     timestamp = typeof timestamp === 'string' ? timestamp : undefined
-    metaData = typeof metaData === 'object' && metaData !== null ? metaData : undefined
+    metadata = typeof metadata === 'object' && metadata !== null ? metadata : undefined
 
-    // if no name and no metaData, usefulness of this crumb is questionable at best so discard
-    if (typeof name !== 'string' && !metaData) return
+    // if no message and no metadata, usefulness of this crumb is questionable at best so discard
+    if (typeof message !== 'string' && !metadata) return
 
-    const crumb = new BugsnagBreadcrumb(name, metaData, type, timestamp)
+    const crumb = new Breadcrumb(message, metadata, type, timestamp)
+    if (!includes(this._config.enabledBreadcrumbTypes, type)) return
+
+    // run synchronous onBreadcrumb callbacks
+    let ignore = false
+    const cbs = this._callbacks.onSession.slice(0)
+    while (!ignore) {
+      if (!cbs.length) {
+        break
+      }
+      try {
+        ignore = cbs.pop()(crumb) === false
+      } catch (e) {
+        this.__logger.error(`Error occurred in onBreadcrumb callback, continuing anyway…`)
+        this.__logger.error(e)
+      }
+    }
+
+    if (ignore) {
+      this.__logger.debug(`Breadcrumb not attached due to onBreadcrumb callback`)
+      return this
+    }
 
     // push the valid crumb onto the queue and maintain the length
-    this.breadcrumbs.push(crumb)
-    if (this.breadcrumbs.length > this.config.maxBreadcrumbs) {
-      this.breadcrumbs = this.breadcrumbs.slice(this.breadcrumbs.length - this.config.maxBreadcrumbs)
+    this._breadcrumbs.push(crumb)
+    if (this._breadcrumbs.length > this._config.maxBreadcrumbs) {
+      this._breadcrumbs = this._breadcrumbs.slice(this._breadcrumbs.length - this._config.maxBreadcrumbs)
     }
-
-    return this
   }
 
-  notify (error, opts = {}, cb = () => {}) {
-    if (!this._configured) throw new Error('client not configured')
-
-    // releaseStage can be set via config.releaseStage or client.app.releaseStage
-    const releaseStage = inferReleaseStage(this)
-
+  notify (error, onError, cb) {
     // ensure we have an error (or a reasonable object representation of an error)
-    let { err, errorFramesToSkip, _opts } = normaliseError(error, opts, this._logger)
-    if (_opts) opts = _opts
+    let { err, errorFramesToSkip } = normaliseError(error, this.__logger)
+    const event = new Event(err.name, err.message, Event.getStacktrace(err, errorFramesToSkip, 2), error)
+    // this._notify(Event.create(err, errorFramesToSkip, 2), onError, cb)
+    return this._notify(event, onError, cb)
+  }
 
-    // ensure opts is an object
-    if (typeof opts !== 'object' || opts === null) opts = {}
+  _notify (event, onError = noop, cb = noop) {
+    event.context = this.context
 
-    // create a report from the error, if it isn't one already
-    const report = BugsnagReport.ensureReport(err, errorFramesToSkip, 2)
+    event._user = { ...this._user }
 
-    report.app = { ...{ releaseStage }, ...report.app, ...this.app }
-    report.context = report.context || opts.context || this.context || undefined
-    report.device = { ...report.device, ...this.device, ...opts.device }
-    report.request = { ...report.request, ...this.request, ...opts.request }
-    report.user = { ...report.user, ...this.user, ...opts.user }
-    report.metaData = { ...report.metaData, ...this.metaData, ...opts.metaData }
-    report.breadcrumbs = this.breadcrumbs.slice(0)
+    // TODO: how deep should we clone this metadata?
+    event._metadata = { ...this._metadata }
+
+    event._breadcrumbs = this._breadcrumbs.slice(0)
+
+    event._app.version = this._config.appVersion
+    event._app.releaseStage = this._config.releaseStage
+    event._app.type = this._config.releaseStage
 
     if (this._session) {
-      this._session.trackError(report)
-      report.session = this._session
-    }
-
-    // set severity if supplied
-    if (opts.severity !== undefined) {
-      report.severity = opts.severity
-      report._handledState.severityReason = { type: 'userSpecifiedSeverity' }
+      this._session.track(event)
+      event.session = this._session
     }
 
     // exit early if the reports should not be sent on the current releaseStage
-    if (isArray(this.config.notifyReleaseStages) && !includes(this.config.notifyReleaseStages, releaseStage)) {
-      this._logger.warn(`Report not sent due to releaseStage/notifyReleaseStages configuration`)
-      return cb(null, report)
+    if (isArray(this._config.enabledReleaseStages) && !includes(this._config.enabledReleaseStages, this._config.releaseStage)) {
+      this.__logger.warn(`Event not sent due to releaseStage/enabledReleaseStages configuration`)
+      return cb(null, event)
     }
 
-    const originalSeverity = report.severity
+    const originalSeverity = event.severity
 
-    const beforeSend = [].concat(opts.beforeSend).concat(this.config.beforeSend)
-    const onBeforeSendErr = err => {
-      this._logger.error(`Error occurred in beforeSend callback, continuing anyway…`)
-      this._logger.error(err)
+    const beforeSend = [].concat(this._callbacks.onError).concat(onError)
+    const onCallbackError = err => {
+      this.__logger.error(`Error occurred in onError callback, continuing anyway…`)
+      this.__logger.error(err)
     }
 
-    some(beforeSend, runBeforeSend(report, onBeforeSendErr), (err, preventSend) => {
-      if (err) onBeforeSendErr(err)
+    some(beforeSend, createCallbackRunner(event, onCallbackError), (err, ignore) => {
+      if (err) onCallbackError(err)
 
-      if (preventSend) {
-        this._logger.debug(`Report not sent due to beforeSend callback`)
-        return cb(null, report)
+      if (ignore) {
+        this.__logger.debug(`Event not sent due to onError callback`)
+        return cb(null, event)
       }
 
-      // only leave a crumb for the error if actually got sent
-      if (this.config.autoBreadcrumbs) {
-        this.leaveBreadcrumb(report.errorClass, {
-          errorClass: report.errorClass,
-          errorMessage: report.errorMessage,
-          severity: report.severity
-        }, 'error')
+      // TODO: ensure some centralised logic goes in place for enabledBreadcrumbTypes
+      this.leaveBreadcrumb(event.errors[0].class, {
+        class: event.errors[0].class,
+        message: event.errors[0].message,
+        severity: event.severity
+      }, 'error')
+
+      if (originalSeverity !== event.severity) {
+        event._handledState.severityReason = { type: 'userCallbackSetSeverity' }
       }
 
-      if (originalSeverity !== report.severity) {
-        report._handledState.severityReason = { type: 'userCallbackSetSeverity' }
-      }
-
-      this._delivery.sendReport({
-        apiKey: report.apiKey || this.config.apiKey,
-        notifier: this.notifier,
-        events: [ report ]
-      }, (err) => cb(err, report))
+      this.__delivery.sendEvent({
+        apiKey: event.apiKey || this._config.apiKey,
+        notifier: this._notifier,
+        events: [ event ]
+      }, (err) => cb(err, event))
     })
   }
 }
 
-const normaliseError = (error, opts, logger) => {
+const normaliseError = (error, logger) => {
   const synthesizedErrorFramesToSkip = 3
 
   const createAndLogUsageError = reason => {
@@ -237,18 +299,10 @@ const normaliseError = (error, opts, logger) => {
 
   let err
   let errorFramesToSkip = 0
-  let _opts
   switch (typeof error) {
     case 'string':
-      if (typeof opts === 'string') {
-        // ≤v3 used to have a notify('ErrorName', 'Error message') interface
-        // report usage/deprecation errors if this function is called like that
-        err = createAndLogUsageError('string/string')
-        _opts = { metaData: { notifier: { notifyArgs: [ error, opts ] } } }
-      } else {
-        err = new Error(String(error))
-        errorFramesToSkip = synthesizedErrorFramesToSkip
-      }
+      err = new Error(String(error))
+      errorFramesToSkip = synthesizedErrorFramesToSkip
       break
     case 'number':
     case 'boolean':
@@ -258,7 +312,7 @@ const normaliseError = (error, opts, logger) => {
       err = createAndLogUsageError('function')
       break
     case 'object':
-      if (error !== null && (isError(error) || error.__isBugsnagReport)) {
+      if (error !== null && isError(error)) {
         err = error
       } else if (error !== null && hasNecessaryFields(error)) {
         err = new Error(error.message || error.errorMessage)
@@ -271,7 +325,7 @@ const normaliseError = (error, opts, logger) => {
     default:
       err = createAndLogUsageError('nothing')
   }
-  return { err, errorFramesToSkip, _opts }
+  return { err, errorFramesToSkip }
 }
 
 const hasNecessaryFields = error =>

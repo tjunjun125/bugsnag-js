@@ -5,7 +5,7 @@ const request = require('./request')
 module.exports = (client) => ({
   sendReport: (report, cb = () => {}) => {
     const _cb = err => {
-      if (err) client._logger.error(`Report failed to send…\n${(err && err.stack) ? err.stack : err}`, err)
+      if (err) client.__logger.error(`Report failed to send…\n${(err && err.stack) ? err.stack : err}`, err)
       cb(err)
     }
 
@@ -27,7 +27,7 @@ module.exports = (client) => ({
   },
   sendSession: (session, cb = () => {}) => {
     const _cb = err => {
-      if (err) client._logger.error(`Session failed to send…\n${(err && err.stack) ? err.stack : err}`, err)
+      if (err) client.__logger.error(`Session failed to send…\n${(err && err.stack) ? err.stack : err}`, err)
       cb(err)
     }
 

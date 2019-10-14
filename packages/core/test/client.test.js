@@ -58,7 +58,7 @@ describe('@bugsnag/core/client', () => {
       client.setOptions({ apiKey: 'API_KEY_YEAH' })
       client.configure()
       client.logger({ debug: log, info: log, warn: log, error: log })
-      client._logger.debug('hey')
+      client.__logger.debug('hey')
     })
     it('can supply a different logger via config', done => {
       const client = new Client(VALID_NOTIFIER)
@@ -76,7 +76,7 @@ describe('@bugsnag/core/client', () => {
         }
       })
       client.configure()
-      client._logger.debug('hey')
+      client.__logger.debug('hey')
     })
     it('is ok with a null logger', () => {
       const client = new Client(VALID_NOTIFIER)
@@ -85,7 +85,7 @@ describe('@bugsnag/core/client', () => {
         logger: null
       })
       client.configure()
-      client._logger.debug('hey')
+      client.__logger.debug('hey')
     })
   })
 
@@ -327,14 +327,14 @@ describe('@bugsnag/core/client', () => {
       expect(payloads[0].events[0].breadcrumbs.length).toBe(0)
     })
 
-    it('doesn’t modify global client.metaData when using updateMetaData() method', () => {
+    it('doesn’t modify global client.metaData when using addMetadata() method', () => {
       const client = new Client(VALID_NOTIFIER)
       client.setOptions({ apiKey: 'API_KEY_YEAH' })
       client.configure()
       client.metaData = { foo: [ 1, 2, 3 ] }
       client.notify(new Error('changes afoot'), {
         beforeSend: (report) => {
-          report.updateMetaData('foo', '3', 1)
+          report.addMetadata('foo', '3', 1)
         }
       })
       expect(client.metaData.foo['3']).toBe(undefined)

@@ -33,8 +33,8 @@ module.exports = {
       // unhandled errors caused by this request
       dom.on('error', (err) => {
         req.bugsnag.notify(createReportFromErr(err, handledState), {}, (e, report) => {
-          if (e) client._logger.error('Failed to send report to Bugsnag')
-          req.bugsnag.config.onUncaughtException(err, report, client._logger)
+          if (e) client.__logger.error('Failed to send report to Bugsnag')
+          req.bugsnag.config.onUncaughtException(err, report, client.__logger)
         })
         if (!res.headersSent) {
           res.statusCode = 500
@@ -49,7 +49,7 @@ module.exports = {
       if (req.bugsnag) {
         req.bugsnag.notify(createReportFromErr(err, handledState))
       } else {
-        client._logger.warn(
+        client.__logger.warn(
           'req.bugsnag is not defined. Make sure the @bugsnag/plugin-express requestHandler middleware is added first.'
         )
         client.notify(createReportFromErr(err, handledState, getRequestAndMetaDataFromReq(req)))

@@ -1,5 +1,5 @@
 const { filter, reduce, keys, isArray, includes } = require('./lib/es-utils')
-const { intRange, stringWithLength } = require('./lib/validators')
+const { intRange, stringWithLength, arrayOfStrings } = require('./lib/validators')
 
 module.exports.schema = {
   apiKey: {
@@ -17,12 +17,12 @@ module.exports.schema = {
     message: 'should be a string',
     validate: value => value === null || stringWithLength(value)
   },
-  autoNotify: {
-    defaultValue: () => true,
+  autoDetectErrors: {
+    defaultValue: () => undefined,
     message: 'should be true|false',
-    validate: value => value === true || value === false
+    validate: (value) => value === true || value === false || value === undefined
   },
-  beforeSend: {
+  onError: {
     defaultValue: () => [],
     message: 'should be a function or array of functions',
     validate: value => typeof value === 'function' || (isArray(value) && filter(value, f => typeof f === 'function').length === value.length)
@@ -32,7 +32,7 @@ module.exports.schema = {
       notify: 'https://notify.bugsnag.com',
       sessions: 'https://sessions.bugsnag.com'
     }),
-    message: 'should be an object containing endpoint URLs { notify, sessions }. sessions is optional if autoCaptureSessions=false',
+    message: 'should be an object containing endpoint URLs { notify, sessions }. sessions is optional if autoTrackSessions=false',
     validate: (val, obj) =>
       // first, ensure it's an object
       (val && typeof val === 'object') &&
@@ -40,20 +40,20 @@ module.exports.schema = {
         // endpoints.notify must always be set
         stringWithLength(val.notify) &&
         // endpoints.sessions must be set unless session tracking is explicitly off
-        (obj.autoCaptureSessions === false || stringWithLength(val.sessions))
+        (obj.autoTrackSessions === false || stringWithLength(val.sessions))
       ) &&
       // ensure no keys other than notify/session are set on endpoints object
       filter(keys(val), k => !includes([ 'notify', 'sessions' ], k)).length === 0
   },
-  autoCaptureSessions: {
+  autoTrackSessions: {
     defaultValue: (val, opts) => opts.endpoints === undefined || (!!opts.endpoints && !!opts.endpoints.sessions),
     message: 'should be true|false',
     validate: val => val === true || val === false
   },
-  notifyReleaseStages: {
+  enabledReleaseStages: {
     defaultValue: () => null,
     message: 'should be an array of strings',
-    validate: value => value === null || (isArray(value) && filter(value, f => typeof f === 'string').length === value.length)
+    validate: value => arrayOfStrings
   },
   releaseStage: {
     defaultValue: () => 'production',
@@ -65,14 +65,14 @@ module.exports.schema = {
     message: 'should be a number ≤40',
     validate: value => intRange(0, 40)(value)
   },
-  autoBreadcrumbs: {
-    defaultValue: () => true,
-    message: 'should be true|false',
-    validate: (value) => typeof value === 'boolean'
+  enabledBreadcrumbTypes: {
+    defaultValue: () => [ 'error', 'user', 'log', 'process', 'state', 'navigation', 'request', 'manual' ],
+    message: 'should be an array of strings',
+    validate: (value) => arrayOfStrings
   },
   user: {
     defaultValue: () => null,
-    message: '(object) user should be an object',
+    message: 'user should be an object',
     validate: (value) => typeof value === 'object'
   },
   metaData: {

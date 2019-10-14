@@ -7,6 +7,8 @@ class Session {
     this.startedAt = isoDate()
     this._handled = 0
     this._unhandled = 0
+    this._app = {}
+    this._device = {}
   }
   toJSON () {
     return {
@@ -15,8 +17,8 @@ class Session {
       events: { handled: this._handled, unhandled: this._unhandled }
     }
   }
-  trackError (report) {
-    this[report._handledState.unhandled ? '_unhandled' : '_handled'] += 1
+  track (event) {
+    this[event._handledState.unhandled ? '_unhandled' : '_handled'] += 1
   }
 }
 

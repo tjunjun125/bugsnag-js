@@ -20,8 +20,8 @@ module.exports = {
           severityReason: { type: 'unhandledException' }
         })
         client.notify(report, opts, (e, report) => {
-          if (e) client._logger.error('Failed to send report to Bugsnag')
-          client.config.onUncaughtException(err, report, client._logger)
+          if (e) client.__logger.error('Failed to send report to Bugsnag')
+          client.config.onUncaughtException(err, report, client.__logger)
         })
       })
       process.nextTick(() => dom.run(fn))

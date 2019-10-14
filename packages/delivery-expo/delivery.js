@@ -19,21 +19,21 @@ module.exports = (client, fetch = global.fetch) => {
       .catch(err => cb(err))
   }
 
-  const logError = e => client._logger.error('Error redelivering payload', e)
+  const logError = e => client.__logger.error('Error redelivering payload', e)
 
   const enqueue = async (payloadKind, failedPayload) => {
-    client._logger.info(`Writing ${payloadKind} payload to cache`)
+    client.__logger.info(`Writing ${payloadKind} payload to cache`)
     await queues[payloadKind].enqueue(failedPayload, logError)
     if (networkStatus.isConnected) queueConsumers[payloadKind].start()
   }
 
   const onerror = async (err, failedPayload, payloadKind, cb) => {
-    client._logger.error(`${payloadKind} failed to send…\n${(err && err.stack) ? err.stack : err}`, err)
+    client.__logger.error(`${payloadKind} failed to send…\n${(err && err.stack) ? err.stack : err}`, err)
     if (failedPayload && err.isRetryable !== false) enqueue(payloadKind, failedPayload)
     cb(err)
   }
 
-  const { queues, queueConsumers } = initRedelivery(networkStatus, client._logger, send)
+  const { queues, queueConsumers } = initRedelivery(networkStatus, client.__logger, send)
 
   return {
     sendReport: (report, cb = () => {}) => {
@@ -56,7 +56,7 @@ module.exports = (client, fetch = global.fetch) => {
           enqueue('report', { url, opts })
           return cb(null)
         }
-        client._logger.info(`Sending report ${report.events[0].errorClass}: ${report.events[0].errorMessage}`)
+        client.__logger.info(`Sending report ${report.events[0].errorClass}: ${report.events[0].errorMessage}`)
         send(url, opts, err => {
           if (err) return onerror(err, { url, opts }, 'report', cb)
           cb(null)
@@ -86,7 +86,7 @@ module.exports = (client, fetch = global.fetch) => {
           enqueue('session', { url, opts })
           return cb(null)
         }
-        client._logger.info(`Sending session`)
+        client.__logger.info(`Sending session`)
         send(url, opts, err => {
           if (err) return onerror(err, { url, opts }, 'session', cb)
           cb(null)

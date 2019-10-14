@@ -69,7 +69,7 @@ module.exports = {
       if (ctx.bugsnag) {
         ctx.bugsnag.notify(createReportFromErr(err, handledState))
       } else {
-        client._logger.warn('ctx.bugsnag is not defined. Make sure the @bugsnag/plugin-koa requestHandler middleware is added first.')
+        client.__logger.warn('ctx.bugsnag is not defined. Make sure the @bugsnag/plugin-koa requestHandler middleware is added first.')
         client.notify(createReportFromErr(err, handledState), getRequestAndMetaDataFromCtx(ctx))
       }
     }

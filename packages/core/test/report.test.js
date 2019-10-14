@@ -59,36 +59,36 @@ describe('@bugsnag/core/report', () => {
     })
   })
 
-  describe('updateMetaData()', () => {
+  describe('addMetadata()', () => {
     it('updates a whole new section', () => {
       const Report = require('../report')
       const r = new Report('Err', 'bad', [])
-      r.updateMetaData('specific detail', { extra: 'stuff' })
+      r.addMetadata('specific detail', { extra: 'stuff' })
       expect(r.metaData['specific detail']).toEqual({ extra: 'stuff' })
     })
 
     it('merges an object with an existing section', () => {
       const Report = require('../report')
       const r = new Report('Err', 'bad', [])
-      r.updateMetaData('specific detail', { extra: 'stuff' })
+      r.addMetadata('specific detail', { extra: 'stuff' })
       expect(r.metaData['specific detail']).toEqual({ extra: 'stuff' })
-      r.updateMetaData('specific detail', { detail: 500 })
+      r.addMetadata('specific detail', { detail: 500 })
       expect(r.metaData['specific detail']).toEqual({ extra: 'stuff', detail: 500 })
     })
 
     it('adds a single property to an existing section', () => {
       const Report = require('../report')
       const r = new Report('Err', 'bad', [])
-      r.updateMetaData('specific detail', { extra: 'stuff' })
+      r.addMetadata('specific detail', { extra: 'stuff' })
       expect(r.metaData['specific detail']).toEqual({ extra: 'stuff' })
-      r.updateMetaData('specific detail', 'more', 'things')
+      r.addMetadata('specific detail', 'more', 'things')
       expect(r.metaData['specific detail']).toEqual({ extra: 'stuff', more: 'things' })
     })
 
     it('creates a new section when updating a single property that doesn’t exist yet', () => {
       const Report = require('../report')
       const r = new Report('Err', 'bad', [])
-      r.updateMetaData('metaaaaa', 'flip', 'flop')
+      r.addMetadata('metaaaaa', 'flip', 'flop')
       expect(r.metaData['metaaaaa']).toEqual({ flip: 'flop' })
     })
 
@@ -96,26 +96,26 @@ describe('@bugsnag/core/report', () => {
       const Report = require('../report')
       const r = new Report('Err', 'bad', [])
       const before = Object.assign({}, r.metaData)
-      r.updateMetaData()
+      r.addMetadata()
       expect(r.metaData).toEqual(before)
-      r.updateMetaData(123)
+      r.addMetadata(123)
       expect(r.metaData).toEqual(before)
-      r.updateMetaData(new Date())
+      r.addMetadata(new Date())
       expect(r.metaData).toEqual(before)
-      r.updateMetaData('strrrr')
+      r.addMetadata('strrrr')
       expect(r.metaData).toEqual(before)
     })
 
     it('removes sections and properties', () => {
       const Report = require('../report')
       const r = new Report('Err', 'bad', [])
-      r.updateMetaData('metaaaaa', 'flip', 'flop')
-      r.updateMetaData('specific detail', { extra: 'stuff', more: 'things' })
+      r.addMetadata('metaaaaa', 'flip', 'flop')
+      r.addMetadata('specific detail', { extra: 'stuff', more: 'things' })
 
-      r.updateMetaData('metaaaaa', null)
+      r.addMetadata('metaaaaa', null)
       expect(r.metaData['metaaaaa']).toBe(undefined)
 
-      r.updateMetaData('specific detail', 'more', null)
+      r.addMetadata('specific detail', 'more', null)
       expect(r.metaData['specific detail']).toEqual({ extra: 'stuff' })
     })
   })
@@ -126,8 +126,8 @@ describe('@bugsnag/core/report', () => {
       const r = new Report('Err', 'bad', [])
 
       // create some things to be removed
-      r.updateMetaData('specific detail', { extra: 'stuff' })
-      r.updateMetaData('another thing', { check: 12, t: 0 })
+      r.addMetadata('specific detail', { extra: 'stuff' })
+      r.addMetadata('another thing', { check: 12, t: 0 })
       expect(r.metaData).toEqual({
         'another thing': { check: 12, t: 0 },
         'specific detail': { extra: 'stuff' }
@@ -145,8 +145,8 @@ describe('@bugsnag/core/report', () => {
       const r = new Report('Err', 'bad', [])
 
       // create some things to be removed
-      r.updateMetaData('specific detail', { extra: 'stuff' })
-      r.updateMetaData('another thing', { check: 12, t: 0 })
+      r.addMetadata('specific detail', { extra: 'stuff' })
+      r.addMetadata('another thing', { check: 12, t: 0 })
       expect(r.metaData).toEqual({
         'another thing': { check: 12, t: 0 },
         'specific detail': { extra: 'stuff' }

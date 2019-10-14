@@ -1,37 +1,39 @@
-module.exports = (report, onError) => (fn, cb) => {
+module.exports = (event, onCallbackError) => (fn, cb) => {
   if (typeof fn !== 'function') return cb(null, false)
   try {
     // if function appears sync…
     if (fn.length !== 2) {
-      const ret = fn(report)
+      const ret = fn(event)
       // check if it returned a "thenable" (promise)
       if (ret && typeof ret.then === 'function') {
         return ret.then(
           // resolve
-          val => setTimeout(() => cb(null, shouldPreventSend(report, val)), 0),
+          val => setTimeout(() => cb(null, shouldPreventSend(val)), 0),
           // reject
           err => {
             setTimeout(() => {
-              onError(err)
+              onCallbackError(err)
               return cb(null, false)
             })
           }
         )
       }
-      return cb(null, shouldPreventSend(report, ret))
+      return cb(null, shouldPreventSend(ret))
     }
     // if function is async…
-    fn(report, (err, result) => {
+    fn(event, (err, result) => {
       if (err) {
-        onError(err)
+        onCallbackError(err)
         return cb(null, false)
       }
-      cb(null, shouldPreventSend(report, result))
+      cb(null, shouldPreventSend(result))
     })
   } catch (e) {
-    onError(e)
+    onCallbackError(e)
     cb(null, false)
   }
 }
 
-const shouldPreventSend = (report, value) => report.isIgnored() || value === false
+// the "return" value has to explicitly be "false" – undefined, null etc. do
+// not prevent the report from being sent
+const shouldPreventSend = value => value === false
