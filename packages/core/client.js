@@ -1,6 +1,5 @@
 const config = require('./config')
 const Event = require('./event')
-const Session = require('./session')
 const Breadcrumb = require('./breadcrumb')
 const { map, includes, isArray } = require('./lib/es-utils')
 const isError = require('./lib/iserror')
@@ -33,7 +32,7 @@ class BugsnagClient {
 
     this._callbacks = {
       onError: [],
-      onSession: [],
+      onSessionPayload: [],
       onBreadcrumb: []
     }
 
@@ -87,7 +86,7 @@ class BugsnagClient {
     if (!validity.valid === true) throw new Error(generateConfigErrorMessage(validity.errors))
 
     if (typeof conf.onError === 'function') conf.onError = [ conf.onError ]
-    if (conf.onError && conf.onError.length) this._callbacks.onError = conf.onError
+    if (conf.onError && conf.onError.length) this._callbacks.onError = this._callbacks.onError.concat(conf.onError)
     if (conf.logger) this._logger(conf.logger)
 
     // merge with existing config
@@ -99,10 +98,6 @@ class BugsnagClient {
   use (plugin, ...args) {
     if (plugin.configSchema) this._extractConfiguration(plugin.configSchema)
     const result = plugin.init(this, ...args)
-    // JS objects are not the safest way to store arbitrarily keyed values,
-    // so bookend the key with some characters that prevent tampering with
-    // stuff like __proto__ etc. (only store the result if the plugin had a
-    // name)
     if (plugin.name) this._plugins[`~${plugin.name}~`] = result
     return this
   }
@@ -126,31 +121,14 @@ class BugsnagClient {
     return this
   }
 
-  startSession () {
-    const session = new Session()
-    session._app.version = this._config.appVersion
-    session._app.releaseStage = this._config.releaseStage
-    session._app.type = this._config.releaseStage
+  _addAppData (entity) {
+    entity.app.version = this._config.appVersion
+    entity.app.releaseStage = this._config.releaseStage
+    entity.app.type = this._config.appType
+  }
 
-    // run synchronous onSession callbacks
-    let ignore = false
-    const cbs = this._callbacks.onSession.slice(0)
-    while (!ignore) {
-      if (!cbs.length) {
-        break
-      }
-      try {
-        ignore = cbs.pop()(session) === false
-      } catch (e) {
-        this.__logger.error(`Error occurred in onSession callback, continuing anyway…`)
-        this.__logger.error(e)
-      }
-    }
-    if (ignore) {
-      this.__logger.debug(`Session not started due to onSession callback`)
-      return this
-    }
-    return this.__sessionDelegate.startSession(this, session)
+  startSession () {
+    return this.__sessionDelegate.startSession(this)
   }
 
   pauseSession () {
@@ -161,14 +139,14 @@ class BugsnagClient {
     return this.__sessionDelegate.resumeSession(this)
   }
 
-  addOnError (fn) {
-    this._callbacks.onError.push(fn)
+  addOnError (fn, front = false) {
+    this._callbacks.onError[front ? 'unshift' : 'push'](fn)
   }
 
   // TODO: add removeOnError
 
-  addOnSession (fn) {
-    this._callbacks.onSession.push(fn)
+  _addOnSessionPayload (fn) {
+    this._callbacks.onSessionPayload.push(fn)
   }
 
   // TODO: add removeOnSession
@@ -190,11 +168,11 @@ class BugsnagClient {
     if (typeof message !== 'string' && !metadata) return
 
     const crumb = new Breadcrumb(message, metadata, type, timestamp)
-    if (!includes(this._config.enabledBreadcrumbTypes, type)) return
+    if (!isArray(this._config.enabledBreadcrumbTypes) || !includes(this._config.enabledBreadcrumbTypes, crumb.type)) return
 
     // run synchronous onBreadcrumb callbacks
     let ignore = false
-    const cbs = this._callbacks.onSession.slice(0)
+    const cbs = this._callbacks.onSessionPayload.slice(0)
     while (!ignore) {
       if (!cbs.length) {
         break
@@ -237,9 +215,7 @@ class BugsnagClient {
 
     event._breadcrumbs = this._breadcrumbs.slice(0)
 
-    event._app.version = this._config.appVersion
-    event._app.releaseStage = this._config.releaseStage
-    event._app.type = this._config.releaseStage
+    this._addAppData(event)
 
     if (this._session) {
       this._session.track(event)
@@ -269,7 +245,7 @@ class BugsnagClient {
       }
 
       // TODO: ensure some centralised logic goes in place for enabledBreadcrumbTypes
-      this.leaveBreadcrumb(event.errors[0].class, {
+      BugsnagClient.prototype.leaveBreadcrumb.call(this, event.errors[0].class, {
         class: event.errors[0].class,
         message: event.errors[0].message,
         severity: event.severity

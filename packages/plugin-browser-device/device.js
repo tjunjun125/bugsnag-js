@@ -10,9 +10,12 @@ module.exports = {
       userAgent: nav.userAgent
     }
 
-    // add time just as the report is sent
     client.addOnError((event) => {
       event.device = { ...event.device, ...device, time: isoDate() }
-    })
+    }, true)
+
+    client._addOnSessionPayload(sessionPayload => {
+      sessionPayload.device = { ...sessionPayload.device, userAgent: device.userAgent }
+    }, true)
   }
 }

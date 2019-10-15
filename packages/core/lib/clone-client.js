@@ -1,22 +1,29 @@
+const Client = require('../client')
+
 module.exports = (client) => {
-  const clone = new client.BugsnagClient(client.notifier)
-  clone.configure({})
+  const clone = new Client({}, {}, client.notifier)
 
   // changes to these properties should be reflected in the original client
-  clone.config = client.config
-  clone.app = client.app
-  clone.context = client.context
-  clone.device = client.device
+  clone._config = client._config
+  clone._context = client._context
+
+  // TODO: how much do we clone this?
+  clone._metadata = { ...client._metadata }
 
   // changes to these properties should not be reflected in the original client,
   // so ensure they are are (shallow) cloned
-  clone.breadcrumbs = client.breadcrumbs.slice()
-  clone.metaData = { ...client.metaData }
-  clone.request = { ...client.request }
-  clone.user = { ...client.user }
+  clone._breadcrumbs = client._breadcrumbs.slice()
+  clone._user = { ...client._user }
 
   clone.__logger = client.__logger
-  clone._delivery = client._delivery
+  clone.__delivery = client.__delivery
+  clone.__sessionDelegate = client.__sessionDelegate
+
+  clone._callbacks = {
+    onError: client._callbacks.onError.slice(),
+    onSessionPayload: client._callbacks.onSessionPayload.slice(),
+    onBreadcrumb: client._callbacks.onBreadcrumb.slice()
+  }
 
   return clone
 }

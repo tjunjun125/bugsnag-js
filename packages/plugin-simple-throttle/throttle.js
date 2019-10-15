@@ -14,7 +14,7 @@ module.exports = {
       // have max events been sent already?
       if (n >= client._config.maxEvents) return false
       n++
-    })
+    }, true)
 
     client.refresh = () => { n = 0 }
   },

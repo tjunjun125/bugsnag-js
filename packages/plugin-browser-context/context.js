@@ -6,6 +6,6 @@ module.exports = {
     client.addOnError(event => {
       if (event.context) return
       event.context = win.location.pathname
-    })
+    }, true)
   }
 }

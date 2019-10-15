@@ -9,7 +9,7 @@ module.exports = {
       map(event.errors, (err) => {
         err.stacktrace = map(err.stacktrace, frame => ({ ...frame, file: strip(frame.file) }))
       })
-    })
+    }, true)
   }
 }
 

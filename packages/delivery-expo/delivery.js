@@ -41,7 +41,7 @@ module.exports = (client, fetch = global.fetch) => {
 
       let body, opts
       try {
-        body = payload.report(report, client.config.filters)
+        body = payload.event(report, client.config.filters)
         opts = {
           method: 'POST',
           headers: {

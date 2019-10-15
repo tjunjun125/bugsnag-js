@@ -1,4 +1,4 @@
-const { isArray, includes } = require('@bugsnag/core/lib/es-utils')
+const { reduce, isArray, includes } = require('@bugsnag/core/lib/es-utils')
 const Session = require('@bugsnag/core/session')
 
 module.exports = {
@@ -9,7 +9,7 @@ const sessionDelegate = {
   startSession: (client, session) => {
     const sessionClient = client
 
-    sessionClient._session = session
+    sessionClient._session = new Session()
     sessionClient._pausedSession = null
 
     const releaseStage = sessionClient._config.releaseStage
@@ -25,10 +25,10 @@ const sessionDelegate = {
       return sessionClient
     }
 
-    sessionClient.__delivery.sendSession({
+    const payload = {
       notifier: sessionClient.notifier,
-      device: sessionClient._session._device,
-      app: sessionClient._session._app,
+      device: {},
+      app: {},
       sessions: [
         {
           id: sessionClient._session.id,
@@ -36,7 +36,15 @@ const sessionDelegate = {
           user: sessionClient.user
         }
       ]
-    })
+    }
+    client._addAppData(payload)
+    const cbs = client._callbacks.onSessionPayload.slice(0)
+    sessionClient.__delivery.sendSession(
+      reduce(cbs, (accum, cb) => {
+        cb(accum)
+        return accum
+      }, payload)
+    )
 
     return sessionClient
   },

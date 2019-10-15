@@ -78,7 +78,7 @@ module.exports = {
         if (!frame || !frame.lineNumber) return
         frame.code = addSurroundingCode(frame.lineNumber)
       })
-    })
+    }, true)
 
     // Proxy all the timer functions whose callback is their 0th argument.
     // Keep a reference to the original setTimeout because we need it later

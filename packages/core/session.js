@@ -7,8 +7,6 @@ class Session {
     this.startedAt = isoDate()
     this._handled = 0
     this._unhandled = 0
-    this._app = {}
-    this._device = {}
   }
   toJSON () {
     return {

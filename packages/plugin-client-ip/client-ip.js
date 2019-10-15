@@ -11,7 +11,7 @@ module.exports = {
       if (event.user && typeof event.user.id === 'undefined') delete event.user.id
       event._user = { id: '[NOT COLLECTED]', ...event.user }
       event.request = { clientIp: '[NOT COLLECTED]', ...event.request }
-    })
+    }, true)
   },
   configSchema: {
     collectUserIp: {

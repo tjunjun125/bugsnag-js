@@ -8,16 +8,21 @@ module.exports.schema = {
     validate: stringWithLength
   },
   appVersion: {
-    defaultValue: () => null,
+    defaultValue: () => undefined,
     message: 'should be a string',
-    validate: value => value === null || stringWithLength(value)
+    validate: value => value === undefined || stringWithLength(value)
   },
   appType: {
-    defaultValue: () => null,
+    defaultValue: () => undefined,
     message: 'should be a string',
-    validate: value => value === null || stringWithLength(value)
+    validate: value => value === undefined || stringWithLength(value)
   },
   autoDetectErrors: {
+    defaultValue: () => undefined,
+    message: 'should be true|false',
+    validate: (value) => value === true || value === false || value === undefined
+  },
+  autoDetectUnhandledRejections: {
     defaultValue: () => undefined,
     message: 'should be true|false',
     validate: (value) => value === true || value === false || value === undefined

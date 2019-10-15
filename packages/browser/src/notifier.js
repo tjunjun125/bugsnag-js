@@ -53,24 +53,20 @@ const Bugsnag = {
 
     if (warningMessage) bugsnag.__logger.warn(warningMessage)
 
-    // always-on browser-specific plugins
+    bugsnag.use(pluginInlineScriptContent)
+    bugsnag.use(pluginStripQueryString)
     bugsnag.use(pluginDevice)
     bugsnag.use(pluginContext)
     bugsnag.use(pluginRequest)
     bugsnag.use(pluginThrottle)
     bugsnag.use(pluginSession)
     bugsnag.use(pluginIp)
-    bugsnag.use(pluginStripQueryString)
-    // TODO: ensure the following two plugins honour the autoDetectErrors option
     bugsnag.use(pluginWindowOnerror)
     bugsnag.use(pluginUnhandledRejection)
     bugsnag.use(pluginNavigationBreadcrumbs)
     bugsnag.use(pluginInteractionBreadcrumbs)
     bugsnag.use(pluginNetworkBreadcrumbs)
     bugsnag.use(pluginConsoleBreadcrumbs)
-
-    // this one added last to avoid wrapping functionality before bugsnag uses it
-    bugsnag.use(pluginInlineScriptContent)
 
     bugsnag.__logger.debug(`Loaded!`)
 

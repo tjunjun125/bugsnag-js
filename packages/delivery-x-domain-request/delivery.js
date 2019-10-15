@@ -11,7 +11,7 @@ module.exports = (client, win = window) => ({
     req.open('POST', url)
     setTimeout(() => {
       try {
-        req.send(payload.report(report, client._config.filters))
+        req.send(payload.event(report, client._config.filters))
       } catch (e) {
         client.__logger.error(e)
         cb(e)

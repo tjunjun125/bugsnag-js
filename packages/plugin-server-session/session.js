@@ -1,19 +1,19 @@
-const { isArray, includes } = require('@bugsnag/core/lib/es-utils')
-const inferReleaseStage = require('@bugsnag/core/lib/infer-release-stage')
+const { reduce, isArray, includes } = require('@bugsnag/core/lib/es-utils')
 const { intRange } = require('@bugsnag/core/lib/validators')
 const clone = require('@bugsnag/core/lib/clone-client')
 const SessionTracker = require('./tracker')
 const Backoff = require('backo')
+const Session = require('@bugsnag/core/session')
 
 module.exports = {
   init: client => {
-    const sessionTracker = new SessionTracker(client.config.sessionSummaryInterval)
+    const sessionTracker = new SessionTracker(client._config.sessionSummaryInterval)
     sessionTracker.on('summary', sendSessionSummary(client))
     sessionTracker.start()
     client._sessionDelegate({
       startSession: client => {
         const sessionClient = clone(client)
-        sessionClient._session = new client.BugsnagSession()
+        sessionClient._session = new Session()
         sessionTracker.track(sessionClient._session)
         return sessionClient
       }
@@ -29,15 +29,13 @@ module.exports = {
 }
 
 const sendSessionSummary = client => sessionCounts => {
-  const releaseStage = inferReleaseStage(client)
-
   // exit early if the reports should not be sent on the current releaseStage
-  if (isArray(client.config.notifyReleaseStages) && !includes(client.config.notifyReleaseStages, releaseStage)) {
-    client.__logger.warn(`Session not sent due to releaseStage/notifyReleaseStages configuration`)
+  if (isArray(client._config.enabledReleaseStages) && !includes(client._config.enabledReleaseStages, client._config.releaseStage)) {
+    client.__logger.warn(`Session not sent due to releaseStage/enabledReleaseStages configuration`)
     return
   }
 
-  if (!client.config.endpoints.sessions) {
+  if (!client._config.endpoints.sessions) {
     client.__logger.warn(`Session not sent due to missing endpoints.sessions configuration`)
     return
   }
@@ -62,11 +60,15 @@ const sendSessionSummary = client => sessionCounts => {
   }
 
   function req (cb) {
-    client._delivery.sendSession({
-      notifier: client.notifier,
-      device: client.device,
-      app: { ...{ releaseStage }, ...client.app },
-      sessionCounts
-    }, cb)
+    const payload = { notifier: client.notifier, sessionCounts, app: {}, device: {} }
+    client._addAppData(payload)
+    const cbs = client._callbacks.onSessionPayload.slice(0)
+    client._delivery.sendSession(
+      reduce(cbs, (accum, cb) => {
+        cb(accum)
+        return accum
+      }, payload),
+      cb
+    )
   }
 }
