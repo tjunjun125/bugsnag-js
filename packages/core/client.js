@@ -210,7 +210,7 @@ class BugsnagClient {
   }
 
   _notify (event, onError = noop, cb = noop) {
-    event.context = this.context
+    event._context = this._context
 
     event._user = { ...this._user }
 

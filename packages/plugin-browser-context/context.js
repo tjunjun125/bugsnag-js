@@ -4,8 +4,8 @@
 module.exports = {
   init: (client, win = window) => {
     client.addOnError(event => {
-      if (event.context) return
-      event.context = win.location.pathname
+      if (event._context) return
+      event._context = win.location.pathname
     }, true)
   }
 }
