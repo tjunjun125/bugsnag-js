@@ -206,7 +206,6 @@ class BugsnagClient {
     // ensure we have an error (or a reasonable object representation of an error)
     let { err, errorFramesToSkip } = normalizError(error, this.__logger, this._depth)
     const event = new Event(err.name, err.message, Event.getStacktrace(err, errorFramesToSkip, 2 + this._depth), error)
-    // this._notify(Event.create(err, errorFramesToSkip, 2), onError, cb)
     return this._notify(event, onError, cb)
   }
 
@@ -224,7 +223,7 @@ class BugsnagClient {
 
     if (this._session) {
       this._session.track(event)
-      event.session = this._session
+      event._session = this._session
     }
 
     // exit early if the reports should not be sent on the current releaseStage

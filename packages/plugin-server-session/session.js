@@ -60,10 +60,10 @@ const sendSessionSummary = client => sessionCounts => {
   }
 
   function req (cb) {
-    const payload = { notifier: client.notifier, sessionCounts, app: {}, device: {} }
+    const payload = { notifier: client._notifier, sessionCounts, app: {}, device: {} }
     client._addAppData(payload)
     const cbs = client._callbacks.onSessionPayload.slice(0)
-    client._delivery.sendSession(
+    client.__delivery.sendSession(
       reduce(cbs, (accum, cb) => {
         cb(accum)
         return accum

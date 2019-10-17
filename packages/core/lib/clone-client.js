@@ -1,11 +1,11 @@
 const Client = require('../client')
 
 module.exports = (client) => {
-  const clone = new Client({}, {}, client.notifier)
+  const clone = new Client({}, {}, client._notifier)
 
-  // changes to these properties should be reflected in the original client
   clone._config = client._config
   clone._context = client._context
+  clone._depth = client._depth
 
   // TODO: how much do we clone this?
   clone._metadata = { ...client._metadata }
@@ -18,6 +18,8 @@ module.exports = (client) => {
   clone.__logger = client.__logger
   clone.__delivery = client.__delivery
   clone.__sessionDelegate = client.__sessionDelegate
+
+  clone._plugins = client._plugins
 
   clone._callbacks = {
     onError: client._callbacks.onError.slice(),
