@@ -4,7 +4,7 @@ const Breadcrumb = require('./breadcrumb')
 const { map, includes, isArray } = require('./lib/es-utils')
 const isError = require('./lib/iserror')
 const some = require('./lib/async-some')
-const createCallbackRunner = require('./lib/run-on-error-callbacks')
+const createCallbackRunner = require('./lib/async-callback-runner')
 const noop = () => {}
 const metadataDelegate = require('./lib/metadata-delegate')
 
@@ -177,7 +177,7 @@ class BugsnagClient {
 
     // run synchronous onBreadcrumb callbacks
     let ignore = false
-    const cbs = this._callbacks.onSessionPayload.slice(0)
+    const cbs = this._callbacks.onBreadcrumb.slice(0)
     while (!ignore) {
       if (!cbs.length) {
         break

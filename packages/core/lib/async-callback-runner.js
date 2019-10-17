@@ -35,5 +35,5 @@ module.exports = (event, onCallbackError) => (fn, cb) => {
 }
 
 // the "return" value has to explicitly be "false" – undefined, null etc. do
-// not prevent the report from being sent
+// not prevent the event from being sent
 const shouldPreventSend = value => value === false
