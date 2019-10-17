@@ -6,18 +6,21 @@
     <script type="text/javascript">
       var ENDPOINT = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
       var API_KEY = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
-      var bugsnagClient = bugsnag({
+      Bugsnag.init({
         apiKey: API_KEY,
         endpoints: { notify: ENDPOINT },
-        beforeSend: function (report) {
-          return false
-        }
+        redactKeys: [ 'api_key', 'secret' ]
       })
     </script>
   </head>
   <body>
     <script>
-      bugsnagClient.notify(new Error('before send does work'))
+      Bugsnag.addMetadata('details', {
+        api_key: 'fffffffff'
+      })
+      Bugsnag.notify(new Error('sensitive?'), function (event) {
+        event.addMetadata('user', { coins: 10, password: '123456', secret: 'don’t tell anyone' })
+      })
     </script>
   </body>
 </html>

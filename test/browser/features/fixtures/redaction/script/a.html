@@ -6,19 +6,17 @@
     <script type="text/javascript">
       var ENDPOINT = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
       var API_KEY = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
-      var bugsnagClient = bugsnag({
+      Bugsnag.init({
         apiKey: API_KEY,
         endpoints: { notify: ENDPOINT },
-        autoNotify: false
       })
     </script>
   </head>
   <body>
     <script>
-      throw new Error('auto notify does not work')
-    </script>
-    <script>
-      bugsnagClient.notify(new Error('manual notify does work'))
+      Bugsnag.notify(new Error('sensitive?'), function (event) {
+        event.addMetadata('user', { coins: 10, password: '123456' })
+      })
     </script>
   </body>
 </html>

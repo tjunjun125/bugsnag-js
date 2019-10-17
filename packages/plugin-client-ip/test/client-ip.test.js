@@ -36,7 +36,7 @@ describe('plugin: ip', () => {
 
     expect(payloads.length).toEqual(1)
     expect(payloads[0].events[0].user).toEqual({ id: 'foobar' })
-    expect(payloads[0].events[0].request).toEqual({ clientIp: '[NOT COLLECTED]' })
+    expect(payloads[0].events[0].request).toEqual({ clientIp: '[REDACTED]' })
   })
 
   it('overwrites a user id if it is explicitly `undefined`', () => {
@@ -52,8 +52,8 @@ describe('plugin: ip', () => {
     client.notify(new Error('noooo'))
 
     expect(payloads.length).toEqual(1)
-    expect(payloads[0].events[0].user).toEqual({ id: '[NOT COLLECTED]' })
-    expect(payloads[0].events[0].request).toEqual({ clientIp: '[NOT COLLECTED]' })
+    expect(payloads[0].events[0].user).toEqual({ id: '[REDACTED]' })
+    expect(payloads[0].events[0].request).toEqual({ clientIp: '[REDACTED]' })
   })
 
   it('redacts user IP if none is provided', () => {
@@ -67,7 +67,7 @@ describe('plugin: ip', () => {
     client.notify(new Error('noooo'))
 
     expect(payloads.length).toEqual(1)
-    expect(payloads[0].events[0].user).toEqual({ id: '[NOT COLLECTED]' })
-    expect(payloads[0].events[0].request).toEqual({ clientIp: '[NOT COLLECTED]' })
+    expect(payloads[0].events[0].user).toEqual({ id: '[REDACTED]' })
+    expect(payloads[0].events[0].request).toEqual({ clientIp: '[REDACTED]' })
   })
 })

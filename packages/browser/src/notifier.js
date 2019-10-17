@@ -53,8 +53,8 @@ const Bugsnag = {
 
     if (warningMessage) bugsnag.__logger.warn(warningMessage)
 
-    bugsnag.use(pluginInlineScriptContent)
     bugsnag.use(pluginStripQueryString)
+    bugsnag.use(pluginInlineScriptContent)
     bugsnag.use(pluginDevice)
     bugsnag.use(pluginContext)
     bugsnag.use(pluginRequest)
@@ -80,7 +80,12 @@ const Bugsnag = {
       return Bugsnag._client
     }
     Bugsnag._client = Bugsnag.createClient(opts)
-  }
+    Bugsnag._client._depth += 1
+  },
+  Client,
+  Event,
+  Session,
+  Breadcrumb
 }
 
 reduce(keys(Client.prototype), (accum, m) => {
@@ -93,15 +98,6 @@ reduce(keys(Client.prototype), (accum, m) => {
 }, Bugsnag)
 
 module.exports = Bugsnag
-
-// Angular's DI system needs this interface to match what is exposed
-// in the type definition file (types/bugsnag.d.ts)
-module.exports.Bugsnag = {
-  Client,
-  Event,
-  Session,
-  Breadcrumb
-}
 
 // Export a "default" property for compatibility with ESM imports
 module.exports['default'] = Bugsnag

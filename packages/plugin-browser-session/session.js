@@ -26,7 +26,7 @@ const sessionDelegate = {
     }
 
     const payload = {
-      notifier: sessionClient.notifier,
+      notifier: sessionClient._notifier,
       device: {},
       app: {},
       sessions: [

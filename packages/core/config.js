@@ -96,7 +96,7 @@ module.exports.schema = {
         true
       ))
   },
-  filters: {
+  redactKeys: {
     defaultValue: () => [ 'password' ],
     message: 'should be an array of strings|regexes',
     validate: value =>

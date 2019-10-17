@@ -63,6 +63,18 @@ class BugsnagEvent {
     return metadataDelegate.clear.call(this, section, key)
   }
 
+  getUser () {
+    return this._user
+  }
+
+  setUser (id, name, email) {
+    this._user = { id, name, email }
+  }
+
+  clearUser () {
+    this._user = {}
+  }
+
   toJSON () {
     return {
       payloadVersion: '4',
