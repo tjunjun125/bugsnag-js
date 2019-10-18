@@ -6,7 +6,7 @@ const { includes, map, reduce, filter } = require('@bugsnag/core/lib/es-utils')
 exports.init = (client) => {
   const isDev = /^dev(elopment)?$/.test(client._config.releaseStage)
 
-  if (!includes(client._config.enabledBreadcrumbTypes, 'log') || isDev) return
+  if (!client._config.enabledBreadcrumbTypes || !includes(client._config.enabledBreadcrumbTypes, 'log') || isDev) return
 
   map(CONSOLE_LOG_METHODS, method => {
     const original = console[method]
