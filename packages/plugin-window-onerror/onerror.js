@@ -63,12 +63,12 @@ module.exports = {
           // attempt to find a message from one of the conventional properties, but
           // default to empty string (the report will fill it with a placeholder)
           const message = messageOrEvent.message || messageOrEvent.detail || ''
-          client._notify(new client.BugsnagReport(
+          client._notify(new Event(
             name,
             message,
-            client.BugsnagReport.getStacktrace(new Error(), 1).slice(1),
-            handledState,
-            messageOrEvent
+            Event.getStacktrace(new Error(), 1).slice(1),
+            messageOrEvent,
+            handledState
           ), (event) => {
             // include the raw input as metadata – it might contain more info than we extracted
             event.addMetadata('window onerror', { event: messageOrEvent, extraParameters: url })
@@ -76,21 +76,20 @@ module.exports = {
         } else {
           // Lastly, if there was no "error" parameter this event was probably from an old
           // browser that doesn't support that. Instead we need to generate a stacktrace.
-          client._notify(new client.BugsnagReport(
+          client._notify(new Event(
             'window.onerror',
             String(messageOrEvent),
-            decorateStack(client.BugsnagReport.getStacktrace(error, 1), url, lineNo, charNo),
-            handledState,
-            messageOrEvent
+            decorateStack(Event.getStacktrace(error, 1), url, lineNo, charNo),
+            messageOrEvent,
+            handledState
           ), (event) => {
             // include the raw input as metadata – it might contain more info than we extracted
             event.addMetadata('window onerror', { event: messageOrEvent })
           })
         }
-
-        // always call through to original onerror handler
-        if (typeof prevOnError === 'function') prevOnError.apply(this, arguments)
       }
+      // always call through to original onerror handler
+      if (typeof prevOnError === 'function') prevOnError.apply(this, arguments)
     }
 
     const prevOnError = win.onerror
