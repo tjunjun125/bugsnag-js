@@ -4,8 +4,7 @@
 module.exports = {
   init: (client, win = window) => {
     client.addOnError(event => {
-      if (event.request && event.request.url) return
-      event.request = { ...event.request, url: win.location.href }
+      event.request.url = win.location.href
     }, true)
   }
 }
