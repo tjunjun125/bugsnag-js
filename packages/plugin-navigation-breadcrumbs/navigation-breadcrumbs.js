@@ -6,7 +6,7 @@ const { includes } = require('@bugsnag/core/lib/es-utils')
 exports.init = (client, win = window) => {
   if (!('addEventListener' in win)) return
 
-  if (!includes(client._config.enabledBreadcrumbTypes, 'navigation')) return
+  if (!client._config.enabledBreadcrumbTypes || !includes(client._config.enabledBreadcrumbTypes, 'navigation')) return
 
   // returns a function that will drop a breadcrumb with a given name
   const drop = name => () => client.leaveBreadcrumb(name, {}, 'navigation')
