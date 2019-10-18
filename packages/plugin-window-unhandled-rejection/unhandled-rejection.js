@@ -8,8 +8,7 @@ const Event = require('@bugsnag/core/event')
  */
 let _listener
 exports.init = (client, win = window) => {
-  if (client._config.autoDetectUnhandledRejections === false) return
-  if (client._config.autoDetectErrors === false && client._config.autoDetectUnhandledRejections !== true) return
+  if (client._config.autoDetectErrors === false || client._config.autoDetectUnhandledRejections === false) return
 
   const listener = event => {
     let error = event.reason
