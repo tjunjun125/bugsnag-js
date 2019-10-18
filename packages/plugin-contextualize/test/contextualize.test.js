@@ -21,12 +21,25 @@ function load (index, cb) {
 
 describe('plugin: contextualize', () => {
   it('should call the onUnhandledException callback when an error is captured', done => {
-    const c = new Client(VALID_NOTIFIER)
-    c.delivery(client => ({
-      sendReport: (report, cb) => {
-        expect(report.events[0].errorMessage).toBe('no item available')
+    const c = new Client({
+      apiKey: 'api_key',
+      onUncaughtException: (err) => {
+        expect(err.message).toBe('no item available')
+        done()
+      }
+    }, {
+      ...schema,
+      onUncaughtException: {
+        validate: val => typeof val === 'function',
+        message: 'should be a function',
+        defaultValue: () => {}
+      }
+    }, VALID_NOTIFIER)
+    c._delivery(client => ({
+      sendEvent: (report, cb) => {
+        expect(report.events[0].errors[0].message).toBe('no item available')
         expect(report.events[0].severity).toBe('warning')
-        expect(report.events[0].user).toEqual({
+        expect(report.events[0]._user).toEqual({
           id: '1a2c3cd4',
           name: 'Ben Gourley',
           email: 'ben.gourley@bugsnag.com'
@@ -35,61 +48,40 @@ describe('plugin: contextualize', () => {
       },
       sendSession: () => {}
     }))
-    c.setOptions({
-      apiKey: 'api_key',
-      onUncaughtException: (err) => {
-        expect(err.message).toBe('no item available')
-        done()
-      }
-    })
-    c.configure({
-      ...schema,
-      onUncaughtException: {
-        validate: val => typeof val === 'function',
-        message: 'should be a function',
-        defaultValue: () => {}
-      }
-    })
     c.use(plugin)
     const contextualize = c.getPlugin('contextualize')
     contextualize(() => {
       load(8, (err) => {
         if (err) throw err
       })
-    }, {
-      user: {
-        id: '1a2c3cd4',
-        name: 'Ben Gourley',
-        email: 'ben.gourley@bugsnag.com'
-      },
-      severity: 'warning'
+    }, event => {
+      event.setUser('1a2c3cd4', 'Ben Gourley', 'ben.gourley@bugsnag.com')
+      event.severity = 'warning'
     })
   })
 
   it('should add a stacktrace when missing', done => {
-    const c = new Client(VALID_NOTIFIER)
-    c.delivery(client => ({
-      sendReport: (report, cb) => {
-        expect(report.events[0].errorMessage).toBe('ENOENT: no such file or directory, open \'does not exist\'')
-        expect(report.events[0].stacktrace[0].file).toBe(`${__filename}`)
-        cb(null)
-      },
-      sendSession: () => {}
-    }))
-    c.setOptions({
+    const c = new Client({
       apiKey: 'api_key',
       onUncaughtException: () => {
         done()
       }
-    })
-    c.configure({
+    }, {
       ...schema,
       onUncaughtException: {
         validate: val => typeof val === 'function',
         message: 'should be a function',
         defaultValue: () => {}
       }
-    })
+    }, VALID_NOTIFIER)
+    c._delivery(client => ({
+      sendEvent: (report, cb) => {
+        expect(report.events[0].errors[0].message).toBe('ENOENT: no such file or directory, open \'does not exist\'')
+        expect(report.events[0].errors[0].stacktrace[0].file).toBe(`${__filename}`)
+        cb(null)
+      },
+      sendSession: () => {}
+    }))
     c.use(plugin)
     const contextualize = c.getPlugin('contextualize')
     contextualize(() => {
@@ -98,28 +90,26 @@ describe('plugin: contextualize', () => {
   })
 
   it('should tolerate a failed report', done => {
-    const c = new Client(VALID_NOTIFIER)
-    c.delivery(client => ({
-      sendReport: (report, cb) => {
-        cb(new Error('sending failed'))
-      },
-      sendSession: () => {}
-    }))
-    c.setOptions({
+    const c = new Client({
       apiKey: 'api_key',
       onUncaughtException: (err) => {
         expect(err.message).toBe('no item available')
         done()
       }
-    })
-    c.configure({
+    }, {
       ...schema,
       onUncaughtException: {
         validate: val => typeof val === 'function',
         message: 'should be a function',
         defaultValue: () => {}
       }
-    })
+    }, VALID_NOTIFIER)
+    c._delivery(client => ({
+      sendEvent: (report, cb) => {
+        cb(new Error('sending failed'))
+      },
+      sendSession: () => {}
+    }))
     c.use(plugin)
     const contextualize = c.getPlugin('contextualize')
     contextualize(() => {
