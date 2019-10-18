@@ -20,9 +20,8 @@ const defaultIgnoredUrls = () => [
 /*
  * Leaves breadcrumbs when network requests occur
  */
-exports.name = 'networkBreadcrumbs'
 exports.init = (_client, _getIgnoredUrls = defaultIgnoredUrls, _win = window) => {
-  if (!includes(_client._config.enabledBreadcrumbTypes, 'request')) return
+  if (!_client._config.enabledBreadcrumbTypes || !includes(_client._config.enabledBreadcrumbTypes, 'request')) return
   client = _client
   win = _win
   getIgnoredUrls = _getIgnoredUrls

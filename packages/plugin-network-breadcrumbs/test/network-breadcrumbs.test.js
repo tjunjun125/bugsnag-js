@@ -46,9 +46,7 @@ describe('plugin: network breadcrumbs', () => {
   it('should leave a breadcrumb when an XMLHTTPRequest resolves', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     const request = new window.XMLHttpRequest()
@@ -56,11 +54,11 @@ describe('plugin: network breadcrumbs', () => {
     // tell the mock request to succeed with status code 200
     request.send(false, 200)
 
-    expect(client.breadcrumbs.length).toBe(1)
-    expect(client.breadcrumbs[0]).toEqual(jasmine.objectContaining({
+    expect(client._breadcrumbs.length).toBe(1)
+    expect(client._breadcrumbs[0]).toEqual(jasmine.objectContaining({
       type: 'request',
-      name: 'XMLHttpRequest succeeded',
-      metaData: {
+      message: 'XMLHttpRequest succeeded',
+      metadata: {
         status: 200,
         request: 'GET /'
       }
@@ -70,35 +68,31 @@ describe('plugin: network breadcrumbs', () => {
   it('should not leave duplicate breadcrumbs if open() is called twice', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, undefined, window)
 
     const request = new window.XMLHttpRequest()
     request.open('GET', '/')
     request.open('GET', '/')
     request.send(false, 200)
-    expect(client.breadcrumbs.length).toBe(1)
+    expect(client._breadcrumbs.length).toBe(1)
   })
 
   it('should leave a breadcrumb when an XMLHTTPRequest has a failed response', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     const request = new window.XMLHttpRequest()
     request.open('GET', '/this-does-not-exist')
     request.send(false, 404)
 
-    expect(client.breadcrumbs.length).toBe(1)
-    expect(client.breadcrumbs[0]).toEqual(jasmine.objectContaining({
+    expect(client._breadcrumbs.length).toBe(1)
+    expect(client._breadcrumbs[0]).toEqual(jasmine.objectContaining({
       type: 'request',
-      name: 'XMLHttpRequest failed',
-      metaData: {
+      message: 'XMLHttpRequest failed',
+      metadata: {
         status: 404,
         request: 'GET /this-does-not-exist'
       }
@@ -108,9 +102,7 @@ describe('plugin: network breadcrumbs', () => {
   it('should leave a breadcrumb when an XMLHTTPRequest has a network error', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     const request = new window.XMLHttpRequest()
@@ -118,11 +110,11 @@ describe('plugin: network breadcrumbs', () => {
     request.open('GET', 'https://another-domain.xyz/')
     request.send(true)
 
-    expect(client.breadcrumbs.length).toBe(1)
-    expect(client.breadcrumbs[0]).toEqual(jasmine.objectContaining({
+    expect(client._breadcrumbs.length).toBe(1)
+    expect(client._breadcrumbs[0]).toEqual(jasmine.objectContaining({
       type: 'request',
-      name: 'XMLHttpRequest error',
-      metaData: {
+      message: 'XMLHttpRequest error',
+      metadata: {
         request: `GET https://another-domain.xyz/`
       }
     }))
@@ -131,46 +123,40 @@ describe('plugin: network breadcrumbs', () => {
   it('should not leave a breadcrumb for request to bugsnag notify endpoint', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, undefined, window)
 
     const request = new window.XMLHttpRequest()
-    request.open('GET', client.config.endpoints.notify)
+    request.open('GET', client._config.endpoints.notify)
     request.send(false, 200)
 
-    expect(client.breadcrumbs.length).toBe(0)
+    expect(client._breadcrumbs.length).toBe(0)
   })
 
   it('should not leave a breadcrumb for session tracking requests', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, undefined, window)
 
     const request = new window.XMLHttpRequest()
-    request.open('GET', client.config.endpoints.sessions)
+    request.open('GET', client._config.endpoints.sessions)
     request.send(false, 200)
-    expect(client.breadcrumbs.length).toBe(0)
+    expect(client._breadcrumbs.length).toBe(0)
   })
 
   it('should leave a breadcrumb when a fetch() resolves', (done) => {
     const window = { XMLHttpRequest, fetch }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     window.fetch('/', {}, false, 200).then(() => {
-      expect(client.breadcrumbs.length).toBe(1)
-      expect(client.breadcrumbs[0]).toEqual(jasmine.objectContaining({
+      expect(client._breadcrumbs.length).toBe(1)
+      expect(client._breadcrumbs[0]).toEqual(jasmine.objectContaining({
         type: 'request',
-        name: 'fetch() succeeded',
-        metaData: {
+        message: 'fetch() succeeded',
+        metadata: {
           status: 200,
           request: 'GET /'
         }
@@ -182,17 +168,15 @@ describe('plugin: network breadcrumbs', () => {
   it('should leave a breadcrumb when a fetch() has a failed response', (done) => {
     const window = { XMLHttpRequest, fetch }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     window.fetch('/does-not-exist', {}, false, 404).then(() => {
-      expect(client.breadcrumbs.length).toBe(1)
-      expect(client.breadcrumbs[0]).toEqual(jasmine.objectContaining({
+      expect(client._breadcrumbs.length).toBe(1)
+      expect(client._breadcrumbs[0]).toEqual(jasmine.objectContaining({
         type: 'request',
-        name: 'fetch() failed',
-        metaData: {
+        message: 'fetch() failed',
+        metadata: {
           status: 404,
           request: 'GET /does-not-exist'
         }
@@ -204,17 +188,15 @@ describe('plugin: network breadcrumbs', () => {
   it('should leave a breadcrumb when a fetch() has a network error', (done) => {
     const window = { XMLHttpRequest, fetch }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa' })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     window.fetch('https://another-domain.xyz/foo/bar', {}, true).catch(() => {
-      expect(client.breadcrumbs.length).toBe(1)
-      expect(client.breadcrumbs[0]).toEqual(jasmine.objectContaining({
+      expect(client._breadcrumbs.length).toBe(1)
+      expect(client._breadcrumbs[0]).toEqual(jasmine.objectContaining({
         type: 'request',
-        name: 'fetch() error',
-        metaData: {
+        message: 'fetch() error',
+        metadata: {
           request: `GET https://another-domain.xyz/foo/bar`
         }
       }))
@@ -222,33 +204,29 @@ describe('plugin: network breadcrumbs', () => {
     })
   })
 
-  it('should not be enabled when autoBreadcrumbs=false', () => {
+  it('should not be enabled when enabledBreadcrumbTypes=null', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa', autoBreadcrumbs: false })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: null }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     const request = new window.XMLHttpRequest()
     request.open('GET', '/')
     request.send(false, 200)
 
-    expect(client.breadcrumbs.length).toBe(0)
+    expect(client._breadcrumbs.length).toBe(0)
   })
 
-  it('should be enabled when autoBreadcrumbs=false and networkBreadcrumbsEnabled=true', () => {
+  it('should be enabled when enabledBreadcrumbTypes=["request"]', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client(VALID_NOTIFIER)
-    client.setOptions({ apiKey: 'aaaa-aaaa-aaaa-aaaa', autoBreadcrumbs: false, networkBreadcrumbsEnabled: true })
-    client.configure()
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: [ 'request' ] }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     const request = new window.XMLHttpRequest()
     request.open('GET', '/')
     request.send(false, 200)
 
-    expect(client.breadcrumbs.length).toBe(1)
+    expect(client._breadcrumbs.length).toBe(1)
   })
 })
