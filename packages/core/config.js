@@ -48,7 +48,7 @@ module.exports.schema = {
         (obj.autoTrackSessions === false || stringWithLength(val.sessions))
       ) &&
       // ensure no keys other than notify/session are set on endpoints object
-      filter(keys(val), k => !includes([ 'notify', 'sessions' ], k)).length === 0
+      filter(keys(val), k => !includes(['notify', 'sessions'], k)).length === 0
   },
   autoTrackSessions: {
     defaultValue: (val, opts) => opts.endpoints === undefined || (!!opts.endpoints && !!opts.endpoints.sessions),
@@ -71,7 +71,7 @@ module.exports.schema = {
     validate: value => intRange(0, 40)(value)
   },
   enabledBreadcrumbTypes: {
-    defaultValue: () => [ 'error', 'user', 'log', 'process', 'state', 'navigation', 'request', 'manual' ],
+    defaultValue: () => ['error', 'user', 'log', 'process', 'state', 'navigation', 'request', 'manual'],
     message: 'should be an array of strings',
     validate: (value) => arrayOfStrings
   },
@@ -91,13 +91,13 @@ module.exports.schema = {
     validate: value =>
       (!value) ||
       (value && reduce(
-        [ 'debug', 'info', 'warn', 'error' ],
+        ['debug', 'info', 'warn', 'error'],
         (accum, method) => accum && typeof value[method] === 'function',
         true
       ))
   },
   redactKeys: {
-    defaultValue: () => [ 'password' ],
+    defaultValue: () => ['password'],
     message: 'should be an array of strings|regexes',
     validate: value =>
       isArray(value) && value.length === filter(value, s =>

@@ -1,0 +1,7 @@
+dist
+examples
+features
+**/node_modules/**
+fixtures
+scratch
+coverage

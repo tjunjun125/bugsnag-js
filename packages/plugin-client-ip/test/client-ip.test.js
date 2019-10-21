@@ -17,9 +17,9 @@ describe('plugin: ip', () => {
         cb()
       }
     }))
-    client.notify(new Error('noooo'), event => { event.request = { 'some': 'detail' } }, () => {
+    client.notify(new Error('noooo'), event => { event.request = { some: 'detail' } }, () => {
       expect(payloads.length).toEqual(1)
-      expect(payloads[0].events[0].request).toEqual({ 'some': 'detail' })
+      expect(payloads[0].events[0].request).toEqual({ some: 'detail' })
       done()
     })
   })

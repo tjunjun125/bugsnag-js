@@ -8,8 +8,8 @@ const createCallbackRunner = require('./lib/async-callback-runner')
 const noop = () => {}
 const metadataDelegate = require('./lib/metadata-delegate')
 
-const LOG_USAGE_ERR_PREFIX = `Usage error.`
-const REPORT_USAGE_ERR_PREFIX = `Bugsnag usage error.`
+const LOG_USAGE_ERR_PREFIX = 'Usage error.'
+const REPORT_USAGE_ERR_PREFIX = 'Bugsnag usage error.'
 
 class BugsnagClient {
   constructor (configuration, schema = config.schema, notifier) {
@@ -90,7 +90,7 @@ class BugsnagClient {
 
     if (!validity.valid === true) throw new Error(generateConfigErrorMessage(validity.errors))
 
-    if (typeof conf.onError === 'function') conf.onError = [ conf.onError ]
+    if (typeof conf.onError === 'function') conf.onError = [conf.onError]
     if (conf.onError && conf.onError.length) this._callbacks.onError = this._callbacks.onError.concat(conf.onError)
     if (conf.logger) this._logger(conf.logger)
 
@@ -185,13 +185,13 @@ class BugsnagClient {
       try {
         ignore = cbs.pop()(crumb) === false
       } catch (e) {
-        this.__logger.error(`Error occurred in onBreadcrumb callback, continuing anyway…`)
+        this.__logger.error('Error occurred in onBreadcrumb callback, continuing anyway…')
         this.__logger.error(e)
       }
     }
 
     if (ignore) {
-      this.__logger.debug(`Breadcrumb not attached due to onBreadcrumb callback`)
+      this.__logger.debug('Breadcrumb not attached due to onBreadcrumb callback')
       return this
     }
 
@@ -204,7 +204,7 @@ class BugsnagClient {
 
   notify (error, onError, cb) {
     // ensure we have an error (or a reasonable object representation of an error)
-    let { err, errorFramesToSkip } = normalizError(error, this.__logger, this._depth)
+    const { err, errorFramesToSkip } = normalizError(error, this.__logger, this._depth)
     const event = new Event(err.name, err.message, Event.getStacktrace(err, errorFramesToSkip, 2 + this._depth), error)
     return this._notify(event, onError, cb)
   }
@@ -228,7 +228,7 @@ class BugsnagClient {
 
     // exit early if the reports should not be sent on the current releaseStage
     if (isArray(this._config.enabledReleaseStages) && !includes(this._config.enabledReleaseStages, this._config.releaseStage)) {
-      this.__logger.warn(`Event not sent due to releaseStage/enabledReleaseStages configuration`)
+      this.__logger.warn('Event not sent due to releaseStage/enabledReleaseStages configuration')
       return cb(null, event)
     }
 
@@ -236,7 +236,7 @@ class BugsnagClient {
 
     const beforeSend = [].concat(this._callbacks.onError).concat(onError)
     const onCallbackError = err => {
-      this.__logger.error(`Error occurred in onError callback, continuing anyway…`)
+      this.__logger.error('Error occurred in onError callback, continuing anyway…')
       this.__logger.error(err)
     }
 
@@ -244,7 +244,7 @@ class BugsnagClient {
       if (err) onCallbackError(err)
 
       if (ignore) {
-        this.__logger.debug(`Event not sent due to onError callback`)
+        this.__logger.debug('Event not sent due to onError callback')
         return cb(null, event)
       }
 
@@ -262,7 +262,7 @@ class BugsnagClient {
       this.__delivery.sendEvent({
         apiKey: event.apiKey || this._config.apiKey,
         notifier: this._notifier,
-        events: [ event ]
+        events: [event]
       }, (err) => cb(err, event))
     })
   }

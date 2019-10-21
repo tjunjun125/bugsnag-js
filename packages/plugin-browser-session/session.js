@@ -16,12 +16,12 @@ const sessionDelegate = {
 
     // exit early if the reports should not be sent on the current releaseStage
     if (isArray(sessionClient._config.enabledReleaseStages) && !includes(sessionClient._config.enabledReleaseStages, releaseStage)) {
-      sessionClient.__logger.warn(`Session not sent due to releaseStage/enabledReleaseStages configuration`)
+      sessionClient.__logger.warn('Session not sent due to releaseStage/enabledReleaseStages configuration')
       return sessionClient
     }
 
     if (!sessionClient._config.endpoints.sessions) {
-      sessionClient.__logger.warn(`Session not sent due to missing endpoints.sessions configuration`)
+      sessionClient.__logger.warn('Session not sent due to missing endpoints.sessions configuration')
       return sessionClient
     }
 

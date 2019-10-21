@@ -54,7 +54,7 @@ describe('@bugsnag/core/event', () => {
       const Event = require('../event')
       const r = new Event('Err', 'bad', [])
       r.addMetadata('metaaaaa', 'flip', 'flop')
-      expect(r._metadata['metaaaaa']).toEqual({ flip: 'flop' })
+      expect(r._metadata.metaaaaa).toEqual({ flip: 'flop' })
     })
 
     it('handles bad input', () => {
@@ -78,7 +78,7 @@ describe('@bugsnag/core/event', () => {
       r.addMetadata('specific detail', { extra: 'stuff', more: 'things' })
 
       r.addMetadata('metaaaaa', null)
-      expect(r._metadata['metaaaaa']).toBe(undefined)
+      expect(r._metadata.metaaaaa).toBe(undefined)
 
       r.addMetadata('specific detail', 'more', null)
       expect(r._metadata['specific detail']).toEqual({ extra: 'stuff' })

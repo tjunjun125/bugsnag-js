@@ -10,7 +10,7 @@ describe('plugin: interaction breadcrumbs', () => {
     const c = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa' }, undefined, VALID_NOTIFIER)
     const { window, winHandlers, els } = getMockWindow()
     c.use(plugin, window)
-    winHandlers['click'].forEach(fn => fn.call(window, { target: els[0] }))
+    winHandlers.click.forEach(fn => fn.call(window, { target: els[0] }))
     expect(c._breadcrumbs.length).toBe(1)
   })
 
@@ -18,15 +18,15 @@ describe('plugin: interaction breadcrumbs', () => {
     const c = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: null }, undefined, VALID_NOTIFIER)
     const { window, winHandlers, els } = getMockWindow()
     c.use(plugin, window)
-    winHandlers['click'].forEach(fn => fn.call(window, { target: els[0] }))
+    winHandlers.click.forEach(fn => fn.call(window, { target: els[0] }))
     expect(c._breadcrumbs.length).toBe(0)
   })
 
   it('should be enabled when autoBreadcrumbs=false and enabledBreadcrumbTypes=["user"]', () => {
-    const c = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: [ 'user' ] }, undefined, VALID_NOTIFIER)
+    const c = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: ['user'] }, undefined, VALID_NOTIFIER)
     const { window, winHandlers, els } = getMockWindow()
     c.use(plugin, window)
-    winHandlers['click'].forEach(fn => fn.call(window, { target: els[0] }))
+    winHandlers.click.forEach(fn => fn.call(window, { target: els[0] }))
     expect(c._breadcrumbs.length).toBe(1)
   })
 })
@@ -55,20 +55,20 @@ const getMockWindow = () => {
     parentNode: null
   }
 
-  parent.parentNode = { childNodes: [ parent ] }
+  parent.parentNode = { childNodes: [parent] }
   els.forEach(el => { el.parentNode = parent })
 
-  let winHandlers = { 'click': [] }
+  const winHandlers = { click: [] }
   const window = {
     addEventListener: function (evt, handler) {
-      winHandlers[evt] = winHandlers[evt] ? winHandlers[evt].concat(handler) : [ handler ]
+      winHandlers[evt] = winHandlers[evt] ? winHandlers[evt].concat(handler) : [handler]
     },
     document: {
       querySelectorAll: function (query) {
         switch (query) {
           case 'BUTTON.button': return els
-          case 'BUTTON.button:nth-child(1)': return [ els[0] ]
-          case 'DIV#buttons': return [ parent ]
+          case 'BUTTON.button:nth-child(1)': return [els[0]]
+          case 'DIV#buttons': return [parent]
           default: return []
         }
       }

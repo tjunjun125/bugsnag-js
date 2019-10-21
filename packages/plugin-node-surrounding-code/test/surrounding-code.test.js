@@ -22,17 +22,17 @@ describe('plugin: node surrounding code', () => {
       sendEvent: (report) => {
         const evt = report.events[0]
         expect(Object.keys(evt.errors[0].stacktrace[0].code))
-          .toEqual([ '19', '20', '21', '22', '23', '24', '25' ])
+          .toEqual(['19', '20', '21', '22', '23', '24', '25'])
         expect(evt.errors[0].stacktrace[0].code['22'])
           .toBe('    if (cb) this.on(\'finish\', () => cb(this.output()))')
 
         expect(Object.keys(evt.errors[0].stacktrace[1].code))
-          .toEqual([ '28', '29', '30', '31', '32', '33', '34' ])
+          .toEqual(['28', '29', '30', '31', '32', '33', '34'])
         expect(evt.errors[0].stacktrace[1].code['31'])
           .toBe('      return nextLevelUp()')
 
         expect(Object.keys(evt.errors[0].stacktrace[2].code))
-          .toEqual([ '115', '116', '117', '118', '119', '120', '121' ])
+          .toEqual(['115', '116', '117', '118', '119', '120', '121'])
         expect(evt.errors[0].stacktrace[2].code['118'])
           .toBe('  \'Ķ\': \'k\', \'Ļ\': \'L\', \'Ņ\': \'N\', \'Ū\': \'u\'')
 
@@ -100,16 +100,16 @@ describe('plugin: node surrounding code', () => {
       sendEvent: (report) => {
         const evt = report.events[0]
         expect(evt.errors[0].stacktrace[0].code).toEqual({
-          '1': '// this is just some arbitrary (but real) javascript for testing, taken from',
-          '2': '// https://github.com/bengourley/source-map-decoder/',
-          '3': '',
-          '4': '//'
+          1: '// this is just some arbitrary (but real) javascript for testing, taken from',
+          2: '// https://github.com/bengourley/source-map-decoder/',
+          3: '',
+          4: '//'
         })
         expect(evt.errors[0].stacktrace[1].code).toEqual({
-          '42': '  return findFile(root, filename)',
-          '43': '',
-          '44': '}',
-          '45': ''
+          42: '  return findFile(root, filename)',
+          43: '',
+          44: '}',
+          45: ''
         })
         done()
       },
@@ -143,10 +143,10 @@ describe('plugin: node surrounding code', () => {
         expect(endCount - startCount).toBe(1)
         report.events[0].errors[0].stacktrace.forEach(stackframe => {
           expect(stackframe.code).toEqual({
-            '1': '// this is just some arbitrary (but real) javascript for testing, taken from',
-            '2': '// https://github.com/bengourley/source-map-decoder/',
-            '3': '',
-            '4': '//'
+            1: '// this is just some arbitrary (but real) javascript for testing, taken from',
+            2: '// https://github.com/bengourley/source-map-decoder/',
+            3: '',
+            4: '//'
           })
         })
         done()

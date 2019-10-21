@@ -141,7 +141,7 @@ describe('@bugsnag/core/client', () => {
         {
           apiKey: 'API_KEY_YEAH',
           releaseStage: 'staging',
-          enabledReleaseStages: [ 'production' ]
+          enabledReleaseStages: ['production']
         },
         undefined,
         VALID_NOTIFIER
@@ -160,7 +160,7 @@ describe('@bugsnag/core/client', () => {
 
     it('includes releaseStage in event.app', done => {
       const client = new Client(
-        { apiKey: 'API_KEY_YEAH', enabledReleaseStages: [ 'staging' ], releaseStage: 'staging' },
+        { apiKey: 'API_KEY_YEAH', enabledReleaseStages: ['staging'], releaseStage: 'staging' },
         undefined,
         VALID_NOTIFIER
       )
@@ -243,11 +243,11 @@ describe('@bugsnag/core/client', () => {
 
     it('doesn’t modify global client metadata when using event.addMetadata()', () => {
       const client = new Client({ apiKey: 'API_KEY_YEAH' }, undefined, VALID_NOTIFIER)
-      client.addMetadata('foo', { list: [ 1, 2, 3 ] })
+      client.addMetadata('foo', { list: [1, 2, 3] })
       client.notify(new Error('changes afoot'), event => {
         event.addMetadata('foo', 'things', 2)
       })
-      expect(client._metadata.foo['things']).toBe(undefined)
+      expect(client._metadata.foo.things).toBe(undefined)
     })
 
     it('should call the callback (success)', done => {
@@ -281,7 +281,7 @@ describe('@bugsnag/core/client', () => {
 
     it('should call the callback even if the report doesn’t send (enabledReleaseStages)', done => {
       const client = new Client(
-        { apiKey: 'API_KEY', enabledReleaseStages: [ 'production' ], releaseStage: 'development' },
+        { apiKey: 'API_KEY', enabledReleaseStages: ['production'], releaseStage: 'development' },
         undefined,
         VALID_NOTIFIER
       )

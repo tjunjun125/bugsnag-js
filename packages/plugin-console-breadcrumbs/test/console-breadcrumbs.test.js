@@ -13,7 +13,7 @@ describe('plugin: console breadcrumbs', () => {
     // make sure it's null-safe
     console.log(null)
     console.log({
-      foo: [ 1, 2, 3, 'four' ]
+      foo: [1, 2, 3, 'four']
     }, {
       pets: {
         cat: 'scratcher',
@@ -49,7 +49,7 @@ describe('plugin: console breadcrumbs', () => {
   })
 
   it('should be enabled when enabledBreadcrumbTypes=["log"]', () => {
-    const c = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: [ 'log' ] }, undefined, VALID_NOTIFIER)
+    const c = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: ['log'] }, undefined, VALID_NOTIFIER)
     c.use(plugin)
     console.log(123)
     expect(c._breadcrumbs.length).toBe(1)

@@ -42,7 +42,7 @@ module.exports = {
       // get whatever html has rendered at this point
       if (!DOMContentLoaded || !html) html = getHtml()
       // simulate the raw html
-      const htmlLines = [ '<!-- DOC START -->' ].concat(html.split('\n'))
+      const htmlLines = ['<!-- DOC START -->'].concat(html.split('\n'))
       const zeroBasedLine = lineNumber - 1
       const start = Math.max(zeroBasedLine - 3, 0)
       const end = Math.min(zeroBasedLine + 3, htmlLines.length)
@@ -82,7 +82,7 @@ module.exports = {
 
     // Proxy all the timer functions whose callback is their 0th argument.
     // Keep a reference to the original setTimeout because we need it later
-    const [ _setTimeout ] = map([
+    const [_setTimeout] = map([
       'setTimeout',
       'setInterval',
       'setImmediate',
@@ -104,7 +104,7 @@ module.exports = {
       'Notification', 'SVGElementInstance', 'Screen', 'TextTrack', 'TextTrackCue', 'TextTrackList',
       'WebSocket', 'WebSocketWorker', 'Worker', 'XMLHttpRequest', 'XMLHttpRequestEventTarget', 'XMLHttpRequestUpload'
     ], o => {
-      if (!win[o] || !win[o].prototype || !win[o].prototype.hasOwnProperty || !win[o].prototype.hasOwnProperty('addEventListener')) return
+      if (!win[o] || !win[o].prototype || !Object.prototype.hasOwnProperty.call(win[o].prototype, 'addEventListener')) return
       __proxy(win[o].prototype, 'addEventListener', original =>
         __traceOriginalScript(original, eventTargetCallbackAccessor)
       )

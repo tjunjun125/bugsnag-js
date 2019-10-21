@@ -68,7 +68,7 @@ const Bugsnag = {
     bugsnag.use(pluginNetworkBreadcrumbs)
     bugsnag.use(pluginConsoleBreadcrumbs)
 
-    bugsnag.__logger.debug(`Loaded!`)
+    bugsnag.__logger.debug('Loaded!')
 
     if (bugsnag._config.autoTrackSessions) bugsnag.startSession()
 
@@ -76,7 +76,7 @@ const Bugsnag = {
   },
   init: (opts) => {
     if (Bugsnag._client) {
-      Bugsnag._client.__logger.warn(`init() called twice`)
+      Bugsnag._client.__logger.warn('init() called twice')
       return Bugsnag._client
     }
     Bugsnag._client = Bugsnag.createClient(opts)
@@ -100,4 +100,4 @@ reduce(keys(Client.prototype), (accum, m) => {
 module.exports = Bugsnag
 
 // Export a "default" property for compatibility with ESM imports
-module.exports['default'] = Bugsnag
+module.exports.default = Bugsnag

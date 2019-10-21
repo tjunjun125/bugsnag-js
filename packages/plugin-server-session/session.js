@@ -31,12 +31,12 @@ module.exports = {
 const sendSessionSummary = client => sessionCounts => {
   // exit early if the reports should not be sent on the current releaseStage
   if (isArray(client._config.enabledReleaseStages) && !includes(client._config.enabledReleaseStages, client._config.releaseStage)) {
-    client.__logger.warn(`Session not sent due to releaseStage/enabledReleaseStages configuration`)
+    client.__logger.warn('Session not sent due to releaseStage/enabledReleaseStages configuration')
     return
   }
 
   if (!client._config.endpoints.sessions) {
-    client.__logger.warn(`Session not sent due to missing endpoints.sessions configuration`)
+    client.__logger.warn('Session not sent due to missing endpoints.sessions configuration')
     return
   }
 

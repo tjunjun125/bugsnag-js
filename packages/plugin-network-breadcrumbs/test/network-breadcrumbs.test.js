@@ -14,10 +14,10 @@ XMLHttpRequest.prototype.open = function (method, url) {
 }
 XMLHttpRequest.prototype.send = function (fail, status) {
   if (fail) {
-    this._listeners['error'].call(this)
+    this._listeners.error.call(this)
   } else {
     this.status = status
-    this._listeners['load'].call(this)
+    this._listeners.load.call(this)
   }
 }
 XMLHttpRequest.prototype.addEventListener = function (evt, listener) {
@@ -115,7 +115,7 @@ describe('plugin: network breadcrumbs', () => {
       type: 'request',
       message: 'XMLHttpRequest error',
       metadata: {
-        request: `GET https://another-domain.xyz/`
+        request: 'GET https://another-domain.xyz/'
       }
     }))
   })
@@ -197,7 +197,7 @@ describe('plugin: network breadcrumbs', () => {
         type: 'request',
         message: 'fetch() error',
         metadata: {
-          request: `GET https://another-domain.xyz/foo/bar`
+          request: 'GET https://another-domain.xyz/foo/bar'
         }
       }))
       done()
@@ -220,7 +220,7 @@ describe('plugin: network breadcrumbs', () => {
   it('should be enabled when enabledBreadcrumbTypes=["request"]', () => {
     const window = { XMLHttpRequest }
 
-    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: [ 'request' ] }, undefined, VALID_NOTIFIER)
+    const client = new Client({ apiKey: 'aaaa-aaaa-aaaa-aaaa', enabledBreadcrumbTypes: ['request'] }, undefined, VALID_NOTIFIER)
     client.use(plugin, () => [], window)
 
     const request = new window.XMLHttpRequest()

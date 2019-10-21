@@ -52,7 +52,7 @@ const Bugsnag = {
 
     plugins.forEach(pl => bugsnag.use(pl))
 
-    bugsnag.__logger.debug(`Loaded!`)
+    bugsnag.__logger.debug('Loaded!')
 
     bugsnag.leaveBreadcrumb = function () {
       bugsnag.__logger.warn('Breadcrumbs are not supported in Node.js yet')
@@ -63,7 +63,7 @@ const Bugsnag = {
   },
   init: (opts) => {
     if (Bugsnag._client) {
-      Bugsnag._client.__logger.warn(`init() called twice`)
+      Bugsnag._client.__logger.warn('init() called twice')
       return Bugsnag._client
     }
     Bugsnag._client = Bugsnag.createClient(opts)
@@ -92,4 +92,4 @@ reduce(keys(Client.prototype), (accum, m) => {
 module.exports = Bugsnag
 
 // Export a "default" property for compatibility with ESM imports
-module.exports['default'] = Bugsnag
+module.exports.default = Bugsnag

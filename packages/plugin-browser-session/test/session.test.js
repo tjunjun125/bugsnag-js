@@ -66,7 +66,7 @@ describe('plugin: sessions', () => {
   })
 
   it('doesn’t send when releaseStage is not in enabledReleaseStages', (done) => {
-    const c = new Client({ apiKey: 'API_KEY', releaseStage: 'foo', enabledReleaseStages: [ 'baz' ] }, undefined, VALID_NOTIFIER)
+    const c = new Client({ apiKey: 'API_KEY', releaseStage: 'foo', enabledReleaseStages: ['baz'] }, undefined, VALID_NOTIFIER)
     c.use(plugin)
     c._delivery(client => ({
       sendSession: (session, cb) => {
