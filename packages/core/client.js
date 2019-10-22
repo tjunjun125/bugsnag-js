@@ -228,7 +228,7 @@ class BugsnagClient {
     // TODO: how deep should we clone this metadata?
     event._metadata = { ...this._metadata }
 
-    event._breadcrumbs = this._breadcrumbs.slice(0)
+    event.breadcrumbs = this._breadcrumbs.slice(0)
 
     this._addAppData(event)
 
