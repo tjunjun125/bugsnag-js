@@ -22,7 +22,7 @@ class BugsnagEvent {
     this._metadata = {}
     this._user = {}
 
-    this._breadcrumbs = []
+    this.breadcrumbs = []
 
     this._session = undefined
 
@@ -82,7 +82,7 @@ class BugsnagEvent {
       severity: this.severity,
       unhandled: this._handledState.unhandled,
       severityReason: this._handledState.severityReason,
-      breadcrumbs: this._breadcrumbs,
+      breadcrumbs: this.breadcrumbs,
       metaData: this._metadata,
       session: this._session,
       user: this._user,

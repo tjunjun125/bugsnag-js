@@ -1,7 +1,7 @@
 const config = require('./config')
 const Event = require('./event')
 const Breadcrumb = require('./breadcrumb')
-const { map, includes, isArray } = require('./lib/es-utils')
+const { filter, map, includes, isArray } = require('./lib/es-utils')
 const isError = require('./lib/iserror')
 const some = require('./lib/async-some')
 const createCallbackRunner = require('./lib/async-callback-runner')
@@ -37,6 +37,7 @@ class BugsnagClient {
 
     this._callbacks = {
       onError: [],
+      onSession: [],
       onSessionPayload: [],
       onBreadcrumb: []
     }
@@ -148,19 +149,29 @@ class BugsnagClient {
     this._callbacks.onError[front ? 'unshift' : 'push'](fn)
   }
 
-  // TODO: add removeOnError
+  removeOnError (fn) {
+    this._callbacks.onError = filter(this._callbacks.onError, f => f !== fn)
+  }
 
   _addOnSessionPayload (fn) {
     this._callbacks.onSessionPayload.push(fn)
   }
 
-  // TODO: add removeOnSession
+  addOnSession (fn) {
+    this._callbacks.onSession.push(fn)
+  }
+
+  removeOnSession (fn) {
+    this._callbacks.onSession = filter(this._callbacks.onSession, f => f !== fn)
+  }
 
   addOnBreadcrumb (fn) {
     this._callbacks.onBreadcrumb.push(fn)
   }
 
-  // TODO: add removeOnBreadcrumb
+  removeOnBreadcrumb (fn) {
+    this._callbacks.onBreadcrumb = filter(this._callbacks.onBreadcrumb, f => f !== fn)
+  }
 
   leaveBreadcrumb (message, metadata, type, timestamp) {
     // coerce bad values so that the defaults get set

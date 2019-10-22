@@ -1,6 +1,7 @@
 {
   "name": "@bugsnag/core",
   "version": "6.4.1",
+  "main": "index.js",
   "types": "types/index.d.ts",
   "description": "Core classes and utilities for Bugsnag notifiers",
   "homepage": "https://www.bugsnag.com/",
@@ -18,7 +19,7 @@
   ],
   "scripts": {
     "test": "nyc --reporter=lcov -- jasmine '!(node_modules)/**/*.test.js'",
-    "test:types": "tslint -c ../../tslint.json types/*.d.ts"
+    "test:types": "tslint -c ../../tslint.json types/*.d.ts && tsc -p types/test/tsconfig.json && jasmine types/test/test.js"
   },
   "author": "Bugsnag",
   "license": "MIT",
@@ -30,6 +31,8 @@
     "stack-generator": "^2.0.3"
   },
   "devDependencies": {
+    "@types/jasmine": "^3.4.4",
+    "@types/node": "^12.11.1",
     "jasmine": "^3.1.0",
     "nyc": "^12.0.2",
     "proxyquire": "^2.0.1",

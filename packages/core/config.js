@@ -80,7 +80,7 @@ module.exports.schema = {
     message: 'user should be an object',
     validate: (value) => typeof value === 'object'
   },
-  metaData: {
+  metadata: {
     defaultValue: () => null,
     message: 'should be an object',
     validate: (value) => typeof value === 'object'
@@ -96,7 +96,7 @@ module.exports.schema = {
         true
       ))
   },
-  redactKeys: {
+  redactedKeys: {
     defaultValue: () => ['password'],
     message: 'should be an array of strings|regexes',
     validate: value =>

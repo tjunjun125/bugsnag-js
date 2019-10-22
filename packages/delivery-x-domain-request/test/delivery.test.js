@@ -28,7 +28,7 @@ describe('delivery:XDomainRequest', () => {
     const config = {
       apiKey: 'aaaaaaaa',
       endpoints: { notify: '/echo/' },
-      redactKeys: []
+      redactedKeys: []
     }
     delivery({ _logger: {}, _config: config }, window).sendEvent(payload, (err) => {
       expect(err).toBe(null)
@@ -67,7 +67,7 @@ describe('delivery:XDomainRequest', () => {
     const config = {
       apiKey: 'aaaaaaaa',
       endpoints: { notify: '/echo/', sessions: '/sessions/' },
-      redactKeys: []
+      redactedKeys: []
     }
     delivery({ logger: {}, _config: config }, window).sendSession(payload, (err) => {
       expect(err).toBe(null)

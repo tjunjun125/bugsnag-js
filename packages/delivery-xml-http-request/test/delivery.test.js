@@ -33,7 +33,7 @@ describe('delivery:XMLHttpRequest', () => {
     const config = {
       apiKey: 'aaaaaaaa',
       endpoints: { notify: '/echo/' },
-      redactKeys: []
+      redactedKeys: []
     }
     delivery({ _config: config, _logger: {} }, { XMLHttpRequest }).sendEvent(payload, (err) => {
       expect(err).toBe(null)
@@ -79,7 +79,7 @@ describe('delivery:XMLHttpRequest', () => {
     const config = {
       apiKey: 'aaaaaaaa',
       endpoints: { notify: '/', sessions: '/echo/' },
-      redactKeys: []
+      redactedKeys: []
     }
     delivery({ _config: config, _logger: {} }, { XMLHttpRequest }).sendSession(payload, (err) => {
       expect(err).toBe(null)
