@@ -1,5 +1,6 @@
 const config = require('./config')
 const Event = require('./event')
+const Session = require('./session')
 const Breadcrumb = require('./breadcrumb')
 const { filter, map, includes, isArray } = require('./lib/es-utils')
 const isError = require('./lib/iserror')
@@ -45,6 +46,11 @@ class BugsnagClient {
     this._plugins = {}
 
     this._extractConfiguration()
+
+    // access to internal classes
+    this.Breadcrumb = Breadcrumb
+    this.Event = Event
+    this.Session = Session
 
     var self = this
     var notify = this.notify

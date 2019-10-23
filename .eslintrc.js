@@ -1,3 +1,4 @@
+// eslint config for .js files
 module.exports = {
   extends: [
     'standard'

@@ -1,17 +1,19 @@
 import Breadcrumb from "./breadcrumb";
 
 declare class Event {
+  private constructor();
+
   public static getStacktrace(
     error: any,
     errorFramesToSkip?: number,
     generatedFramesToSkip?: number,
-  ): IStackframe[];
+  ): Stackframe[];
 
-  public app: IApp;
-  public device: IDevice;
-  public request: IRequest;
+  public app: App;
+  public device: Device;
+  public request: Request;
 
-  public errors: IError[];
+  public errors: Error[];
   public breadcrumbs: Breadcrumb[];
 
   public severity: "info" | "warning" | "error";
@@ -23,7 +25,7 @@ declare class Event {
   public groupingHash?: string;
 
   // user
-  public getUser(): { id?: string, name?: string, email?: string };
+  public getUser(): { id?: string; name?: string; email?: string };
   public setUser(id: string, name?: string, email?: string): void;
   public clearUser(): void;
 
@@ -34,7 +36,7 @@ declare class Event {
   public clearMetadata(section: string, key?: string): void;
 }
 
-interface IHandledState {
+interface HandledState {
   severity: string;
   unhandled: boolean;
   severityReason: {
@@ -43,7 +45,7 @@ interface IHandledState {
   };
 }
 
-interface IStackframe {
+interface Stackframe {
   file: string;
   method?: string;
   lineNumber?: number;
@@ -52,27 +54,27 @@ interface IStackframe {
   inProject?: boolean;
 }
 
-interface IError {
+interface Error {
   class: string;
   message: string;
-  stacktrace: IStackframe[];
+  stacktrace: Stackframe[];
 }
 
-interface IDevice {
+interface Device {
   runtimeVersions: {
     [key: string]: any;
   };
   [key: string]: any;
 }
 
-interface IApp {
+interface App {
   version?: string;
   releaseStage?: string;
   type?: string;
   [key: string]: any;
 }
 
-interface IRequest {
+interface Request {
   url?: string;
   [key: string]: any;
 }

@@ -81,11 +81,7 @@ const Bugsnag = {
     }
     Bugsnag._client = Bugsnag.createClient(opts)
     Bugsnag._client._depth += 1
-  },
-  Client,
-  Event,
-  Session,
-  Breadcrumb
+  }
 }
 
 reduce(keys(Client.prototype), (accum, m) => {
@@ -98,6 +94,11 @@ reduce(keys(Client.prototype), (accum, m) => {
 }, Bugsnag)
 
 module.exports = Bugsnag
+
+module.exports.Client = Client
+module.exports.Event = Event
+module.exports.Session = Session
+module.exports.Breadcrumb = Breadcrumb
 
 // Export a "default" property for compatibility with ESM imports
 module.exports.default = Bugsnag

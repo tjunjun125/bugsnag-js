@@ -3,21 +3,22 @@ import Client from "./client";
 import Event from "./event";
 import Session from "./session";
 
-export interface IConfig {
+export interface Config {
   apiKey: string;
-  onError?: OnErrorCallback | OnErrorCallback[];
-  autoDetectErrors?: boolean;
-  autoDetectUnhandledRejections?: boolean;
   appVersion?: string;
   appType?: string;
-  endpoints?: { notify: string, sessions?: string };
+  autoDetectErrors?: boolean;
+  autoDetectUnhandledRejections?: boolean;
+  onError?: OnErrorCallback | OnErrorCallback[];
+  endpoints?: { notify: string; sessions?: string };
   autoTrackSessions?: boolean;
   enabledReleaseStages?: string[];
   releaseStage?: string;
   maxBreadcrumbs?: number;
-  user?: { id?: string, name?: string, email?: string } | null;
+  enabledBreadcrumbTypes?: BreadcrumbType[];
+  user?: { id?: string; name?: string; email?: string } | null;
   metadata?: object | null;
-  logger?: ILogger | null;
+  logger?: Logger | null;
   redactedKeys?: Array<string | RegExp>;
   [key: string]: any;
 }
@@ -26,24 +27,26 @@ export type OnErrorCallback = (event: Event, cb?: (err: null | Error) => void) =
 export type OnSessionCallback = (session: Session) => void | boolean;
 export type OnBreadcrumbCallback = (breadcrumb: Breadcrumb) => void | boolean;
 
-export interface IPlugin {
+export type BreadcrumbType = "error" | "log" | "manual" | "navigation" | "process" | "request" | "state" | "user";
+
+export interface Plugin {
   name?: string;
   init: (client: Client) => any;
-  configSchema?: IConfigSchema;
+  configSchema?: ConfigSchema;
   destroy?(): void;
 }
 
-export interface IConfigSchemaEntry {
+export interface ConfigSchemaEntry {
   message: string;
   validate: (val: any) => boolean;
   defaultValue: () => any;
 }
 
-export interface IConfigSchema {
-  [key: string]: IConfigSchemaEntry;
+export interface ConfigSchema {
+  [key: string]: ConfigSchemaEntry;
 }
 
-export interface ILogger {
+export interface Logger {
   debug: (...args: any[]) => void;
   info: (...args: any[]) => void;
   warn: (...args: any[]) => void;
@@ -51,6 +54,6 @@ export interface ILogger {
 }
 
 export type NotifiableError = Error
-  | { errorClass: string; errorMessage: string; }
-  | { name: string; message: string; }
+  | { errorClass: string; errorMessage: string }
+  | { name: string; message: string }
   | any;

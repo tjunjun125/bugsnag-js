@@ -1,6 +1,17 @@
 import * as BugsnagCore from '../..'
 import "jasmine"
 
+// the client's constructor isn't public in TS so this drops down to JS to create one for the tests
+function createClient (opts: BugsnagCore.Config): BugsnagCore.Client {
+  const c = new (BugsnagCore.Client as any)(opts, undefined, { name: 'Type Tests', version: 'nope', url: 'https://github.com/bugsnag/bugsnag-js' })
+  c._delivery(() => ({
+    sendSession: (p: any, cb: () => void): void => { cb() },
+    sendEvent: (p: any, cb: () => void): void => { cb() }
+  }))
+  c._sessionDelegate({ startSession: () => c, pauseSession: () => {}, resumeSession: () => {} })
+  return (c as BugsnagCore.Client)
+}
+
 describe('Type definitions', () => {
   it('has all the classes matching the types available at runtime', () => {
     expect(BugsnagCore.Client).toBeDefined()
@@ -20,8 +31,10 @@ describe('Type definitions', () => {
       event.addMetadata('jkl', 'mno', 'pqr')
       event.clearMetadata('jkl')
       const val: any = event.getMetadata('jkl')
+      expect(val).toBe(undefined)
     }, (err, event) => {
       expect(err).toBe(undefined)
+      expect(event).toBeTruthy()
       done()
     })
   })
@@ -65,6 +78,7 @@ describe('Type definitions', () => {
     client.addMetadata('jkl', 'mno', 'pqr')
     client.clearMetadata('jkl')
     const val: any = client.getMetadata('jkl')
+    expect(val).toBe(undefined)
     expect(client.getMetadata('abc', 'def')).toBe('ghi')
   })
 
@@ -82,14 +96,3 @@ describe('Type definitions', () => {
     expect(client.getUser()).toEqual({})
   })
 })
-
-// the client's constructor isn't public in TS so this drops down to JS to create one for the tests
-function createClient (opts: BugsnagCore.IConfig): BugsnagCore.Client {
-  const c = new (BugsnagCore.Client as any)(opts, undefined, { name: 'Type Tests', version: 'nope', url: 'https://github.com/bugsnag/bugsnag-js' })
-  c._delivery(() => ({
-    sendSession: (p: any, cb: () => void) => { cb() },
-    sendEvent: (p: any, cb: () => void) => { cb() }
-  }))
-  c._sessionDelegate({ startSession: () => c, pauseSession: () => {}, resumeSession: () => {} })
-  return (c as BugsnagCore.Client)
-}

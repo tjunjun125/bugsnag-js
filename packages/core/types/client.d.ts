@@ -1,5 +1,5 @@
-import Breadcrumb from "./breadcrumb";
 import * as common from "./common";
+import Breadcrumb from "./breadcrumb";
 import Event from "./event";
 import Session from "./session";
 
@@ -14,7 +14,7 @@ declare class Client {
   ): void;
 
   // breadcrumbs
-  public leaveBreadcrumb(message: string, metadata?: any, type?: string, timestamp?: string): Client;
+  public leaveBreadcrumb(message: string, metadata?: any, type?: string, timestamp?: string): void;
 
   // metadata
   public addMetadata(section: string, values: { [key: string]: any }): void;
@@ -27,7 +27,7 @@ declare class Client {
   public setContext(c: string): void;
 
   // user
-  public getUser(): { id?: string, name?: string, email?: string };
+  public getUser(): { id?: string; name?: string; email?: string };
   public setUser(id: string, name?: string, email?: string): void;
   public clearUser(): void;
 
@@ -47,8 +47,13 @@ declare class Client {
   public removeOnBreadcrumb(fn: common.OnBreadcrumbCallback): void;
 
   // plugins
-  public use(plugin: common.IPlugin, ...args: any[]): Client;
+  public use(plugin: common.Plugin, ...args: any[]): Client;
   public getPlugin(name: string): any;
+
+  // access to internal classes
+  public Breadcrumb: typeof Breadcrumb;
+  public Event: typeof Event;
+  public Session: typeof Session;
 }
 
 export default Client;

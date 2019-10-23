@@ -5,3 +5,4 @@ features
 fixtures
 scratch
 coverage
+packages/core/types/test/*.js
