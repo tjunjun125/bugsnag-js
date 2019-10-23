@@ -1,23 +1,28 @@
-import * as BugsnagCore from '../..'
+import Bugsnag, { Client, Event, Session, Breadcrumb, AbstractTypes } from '../..'
 import "jasmine"
 
 // the client's constructor isn't public in TS so this drops down to JS to create one for the tests
-function createClient (opts: BugsnagCore.Config): BugsnagCore.Client {
-  const c = new (BugsnagCore.Client as any)(opts, undefined, { name: 'Type Tests', version: 'nope', url: 'https://github.com/bugsnag/bugsnag-js' })
+function createClient (opts: AbstractTypes.Config): Client {
+  const c = new (Bugsnag.Client as any)(opts, undefined, { name: 'Type Tests', version: 'nope', url: 'https://github.com/bugsnag/bugsnag-js' })
   c._delivery(() => ({
     sendSession: (p: any, cb: () => void): void => { cb() },
     sendEvent: (p: any, cb: () => void): void => { cb() }
   }))
   c._sessionDelegate({ startSession: () => c, pauseSession: () => {}, resumeSession: () => {} })
-  return (c as BugsnagCore.Client)
+  return (c as Bugsnag.Client)
 }
 
 describe('Type definitions', () => {
   it('has all the classes matching the types available at runtime', () => {
-    expect(BugsnagCore.Client).toBeDefined()
-    expect(BugsnagCore.Breadcrumb).toBeDefined()
-    expect(BugsnagCore.Event).toBeDefined()
-    expect(BugsnagCore.Session).toBeDefined()
+    expect(Bugsnag.Client).toBeDefined()
+    expect(Bugsnag.Breadcrumb).toBeDefined()
+    expect(Bugsnag.Event).toBeDefined()
+    expect(Bugsnag.Session).toBeDefined()
+    const client = createClient({ apiKey: 'API_KEY' })
+    expect(client.Breadcrumb).toBeDefined()
+    expect(client.Event).toBeDefined()
+    expect(client.Session).toBeDefined()
+
   })
 
   it('works for reporting errors', done => {
