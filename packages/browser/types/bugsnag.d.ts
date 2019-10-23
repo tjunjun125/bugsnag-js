@@ -27,57 +27,7 @@ declare module "@bugsnag/core" {
   }
 }
 
-declare const Bugsnag: BugsnagStatic;
-
-interface BugsnagStatic {
-  init(apiKeyOrOpts: string | AbstractTypes.Config): void;
-
-  createClient(apiKeyOrOpts: string | AbstractTypes.Config): Client;
-
-  // reporting errors
-  notify(
-    error: AbstractTypes.NotifiableError,
-    onError?: AbstractTypes.OnErrorCallback,
-    cb?: (err: any, event: Event) => void,
-  ): void;
-
-  // breadcrumbs
-  leaveBreadcrumb(message: string, metadata?: any, type?: string, timestamp?: string): Client;
-
-  // metadata
-  addMetadata(section: string, values: { [key: string]: any }): void;
-  addMetadata(section: string, key: string, value: any): void;
-  getMetadata(section: string, key?: string): any;
-  clearMetadata(section: string, key?: string): void;
-
-  // context
-  getContext(): string | undefined;
-  setContext(c: string): void;
-
-  // user
-  getUser(): { id?: string; name?: string; email?: string };
-  setUser(id: string, name?: string, email?: string): void;
-  clearUser(): void;
-
-  // reporting sesions
-  startSession(): Client;
-  pauseSession(): void;
-  resumeSession(): boolean;
-
-  // callbacks
-  addOnError(fn: AbstractTypes.OnErrorCallback): void;
-  removeOnError(fn: AbstractTypes.OnErrorCallback): void;
-
-  addOnSession(fn: AbstractTypes.OnSessionCallback): void;
-  removeOnSession(fn: AbstractTypes.OnSessionCallback): void;
-
-  addOnBreadcrumb(fn: AbstractTypes.OnBreadcrumbCallback): void;
-  removeOnBreadcrumb(fn: AbstractTypes.OnBreadcrumbCallback): void;
-
-  // plugins
-  use(plugin: AbstractTypes.Plugin, ...args: any[]): Client;
-  getPlugin(name: string): any;
-}
+declare const Bugsnag: AbstractTypes.BugsnagStatic;
 
 export default Bugsnag;
 export { Client, Breadcrumb, Event, Session, AbstractTypes };

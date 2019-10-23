@@ -1,4 +1,4 @@
-import Bugsnag, { Client, Event, Session, Breadcrumb, AbstractTypes } from '../..'
+import Bugsnag, { Client , AbstractTypes } from '../..'
 import "jasmine"
 
 // the client's constructor isn't public in TS so this drops down to JS to create one for the tests

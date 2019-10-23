@@ -2,6 +2,7 @@ import Breadcrumb from "./breadcrumb";
 import Client from "./client";
 import Event from "./event";
 import Session from "./session";
+import BugsnagStatic from "./bugsnag";
 
 export interface Config {
   apiKey: string;
@@ -57,3 +58,5 @@ export type NotifiableError = Error
   | { errorClass: string; errorMessage: string }
   | { name: string; message: string }
   | any;
+
+export { BugsnagStatic }
