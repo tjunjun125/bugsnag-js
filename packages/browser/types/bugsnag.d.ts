@@ -45,7 +45,7 @@ interface BugsnagStatic {
   leaveBreadcrumb(message: string, metadata?: any, type?: string, timestamp?: string): Client;
 
   // metadata
-  addMetadata(section: string, values: { [key: string]: any }): void
+  addMetadata(section: string, values: { [key: string]: any }): void;
   addMetadata(section: string, key: string, value: any): void;
   getMetadata(section: string, key?: string): any;
   clearMetadata(section: string, key?: string): void;
