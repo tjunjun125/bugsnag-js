@@ -1,6 +1,6 @@
 /* eslint node/no-deprecated-api: [error, {ignoreModuleItems: ["domain"]}] */
 const domain = require('domain')
-const createReportFromErr = require('@bugsnag/core/lib/ensure-error')
+const ensureError = require('@bugsnag/core/lib/ensure-error')
 const Event = require('@bugsnag/core/event')
 const { getStack, maybeUseFallbackStack } = require('@bugsnag/core/lib/node-fallback-stack')
 
@@ -21,7 +21,7 @@ module.exports = {
       dom.on('error', maybeError => {
         // check if the stacktrace has no context, if so, if so append the frames we created earlier
         if (maybeError && maybeError.stack) maybeUseFallbackStack(maybeError, fallbackStack)
-        const { actualError, metadata } = createReportFromErr(maybeError)
+        const { actualError, metadata } = ensureError(maybeError)
         client._notify(new Event(
           actualError.name,
           actualError.message,

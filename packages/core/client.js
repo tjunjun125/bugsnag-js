@@ -28,7 +28,7 @@ class BugsnagClient {
 
     this.__delivery = { sendSession: noop, sendEvent: noop }
     this.__logger = { debug: noop, info: noop, warn: noop, error: noop }
-    this.__sessionDelegate = { startSession: noop, pauseSession: noop, resumeSession: noop }
+    this.__sessionDelegate = { startSession: () => this, pauseSession: noop, resumeSession: noop }
 
     this._session = null
     this._breadcrumbs = []
@@ -51,6 +51,7 @@ class BugsnagClient {
     this.Breadcrumb = Breadcrumb
     this.Event = Event
     this.Session = Session
+    this.Client = BugsnagClient
 
     var self = this
     var notify = this.notify

@@ -1,7 +1,5 @@
-const Client = require('../client')
-
 module.exports = (client) => {
-  const clone = new Client({}, {}, client._notifier)
+  const clone = new client.Client({}, {}, client._notifier)
 
   clone._config = client._config
   clone._context = client._context
