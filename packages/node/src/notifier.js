@@ -71,15 +71,6 @@ const Bugsnag = {
   }
 }
 
-// Angular's DI system needs this interface to match what is exposed
-// in the type definition file (types/bugsnag.d.ts)
-module.exports.Bugsnag = {
-  Client,
-  Event,
-  Session,
-  Breadcrumb
-}
-
 reduce(keys(Client.prototype), (accum, m) => {
   if (/^_/.test(m)) return accum
   accum[m] = function () {
@@ -90,6 +81,11 @@ reduce(keys(Client.prototype), (accum, m) => {
 }, Bugsnag)
 
 module.exports = Bugsnag
+
+module.exports.Client = Client
+module.exports.Event = Event
+module.exports.Session = Session
+module.exports.Breadcrumb = Breadcrumb
 
 // Export a "default" property for compatibility with ESM imports
 module.exports.default = Bugsnag
