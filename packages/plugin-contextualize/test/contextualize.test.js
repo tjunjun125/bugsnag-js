@@ -37,7 +37,7 @@ describe('plugin: contextualize', () => {
     }, VALID_NOTIFIER)
     c._delivery(client => ({
       sendEvent: (report, cb) => {
-        expect(report.events[0].errors[0].message).toBe('no item available')
+        expect(report.events[0].errors[0].errorMessage).toBe('no item available')
         expect(report.events[0].severity).toBe('warning')
         expect(report.events[0]._user).toEqual({
           id: '1a2c3cd4',
@@ -76,7 +76,7 @@ describe('plugin: contextualize', () => {
     }, VALID_NOTIFIER)
     c._delivery(client => ({
       sendEvent: (report, cb) => {
-        expect(report.events[0].errors[0].message).toBe('ENOENT: no such file or directory, open \'does not exist\'')
+        expect(report.events[0].errors[0].errorMessage).toBe('ENOENT: no such file or directory, open \'does not exist\'')
         expect(report.events[0].errors[0].stacktrace[0].file).toBe(`${__filename}`)
         cb(null)
       },

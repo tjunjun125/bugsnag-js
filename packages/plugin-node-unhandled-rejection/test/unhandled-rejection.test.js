@@ -26,12 +26,12 @@ describe('plugin: node unhandled rejection handler', () => {
   it('should call the configured onUnhandledRejection callback', done => {
     const c = new Client({
       apiKey: 'api_key',
-      onUnhandledRejection: (err, report) => {
+      onUnhandledRejection: (err, event) => {
         expect(err.message).toBe('never gonna catch me')
-        expect(report.errors[0].message).toBe('never gonna catch me')
-        expect(report._handledState.unhandled).toBe(true)
-        expect(report._handledState.severity).toBe('error')
-        expect(report._handledState.severityReason).toEqual({ type: 'unhandledPromiseRejection' })
+        expect(event.errors[0].errorMessage).toBe('never gonna catch me')
+        expect(event._handledState.unhandled).toBe(true)
+        expect(event._handledState.severity).toBe('error')
+        expect(event._handledState.severityReason).toEqual({ type: 'unhandledPromiseRejection' })
         plugin.destroy()
         done()
       }
@@ -54,12 +54,12 @@ describe('plugin: node unhandled rejection handler', () => {
   it('should tolerate delivery errors', done => {
     const c = new Client({
       apiKey: 'api_key',
-      onUnhandledRejection: (err, report) => {
+      onUnhandledRejection: (err, event) => {
         expect(err.message).toBe('never gonna catch me')
-        expect(report.errors[0].message).toBe('never gonna catch me')
-        expect(report._handledState.unhandled).toBe(true)
-        expect(report._handledState.severity).toBe('error')
-        expect(report._handledState.severityReason).toEqual({ type: 'unhandledPromiseRejection' })
+        expect(event.errors[0].errorMessage).toBe('never gonna catch me')
+        expect(event._handledState.unhandled).toBe(true)
+        expect(event._handledState.severity).toBe('error')
+        expect(event._handledState.severityReason).toEqual({ type: 'unhandledPromiseRejection' })
         plugin.destroy()
         done()
       }

@@ -28,7 +28,7 @@ describe('plugin: node uncaught exception handler', () => {
       apiKey: 'api_key',
       onUncaughtException: (err, event) => {
         expect(err.message).toBe('never gonna catch me')
-        expect(event.errors[0].message).toBe('never gonna catch me')
+        expect(event.errors[0].errorMessage).toBe('never gonna catch me')
         expect(event._handledState.unhandled).toBe(true)
         expect(event._handledState.severity).toBe('error')
         expect(event._handledState.severityReason).toEqual({ type: 'unhandledException' })
@@ -56,7 +56,7 @@ describe('plugin: node uncaught exception handler', () => {
       apiKey: 'api_key',
       onUncaughtException: (err, event) => {
         expect(err.message).toBe('never gonna catch me')
-        expect(event.errors[0].message).toBe('never gonna catch me')
+        expect(event.errors[0].errorMessage).toBe('never gonna catch me')
         expect(event._handledState.unhandled).toBe(true)
         expect(event._handledState.severity).toBe('error')
         expect(event._handledState.severityReason).toEqual({ type: 'unhandledException' })

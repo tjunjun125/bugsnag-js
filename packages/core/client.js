@@ -267,9 +267,9 @@ class BugsnagClient {
       }
 
       // TODO: ensure some centralised logic goes in place for enabledBreadcrumbTypes
-      BugsnagClient.prototype.leaveBreadcrumb.call(this, event.errors[0].class, {
-        class: event.errors[0].class,
-        message: event.errors[0].message,
+      BugsnagClient.prototype.leaveBreadcrumb.call(this, event.errors[0].errorClass, {
+        errorClass: event.errors[0].errorClass,
+        errorMessage: event.errors[0].errorMessage,
         severity: event.severity
       }, 'error')
 

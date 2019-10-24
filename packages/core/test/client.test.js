@@ -259,7 +259,7 @@ describe('@bugsnag/core/client', () => {
       client.notify(new Error('111'), () => {}, (err, report) => {
         expect(err).toBe(null)
         expect(report).toBeTruthy()
-        expect(report.errors[0].message).toBe('111')
+        expect(report.errors[0].errorMessage).toBe('111')
         done()
       })
     })
@@ -274,7 +274,7 @@ describe('@bugsnag/core/client', () => {
         expect(err).toBeTruthy()
         expect(err.message).toBe('flerp')
         expect(report).toBeTruthy()
-        expect(report.errors[0].message).toBe('111')
+        expect(report.errors[0].errorMessage).toBe('111')
         done()
       })
     })
@@ -292,7 +292,7 @@ describe('@bugsnag/core/client', () => {
       client.notify(new Error('111'), () => {}, (err, report) => {
         expect(err).toBe(null)
         expect(report).toBeTruthy()
-        expect(report.errors[0].message).toBe('111')
+        expect(report.errors[0].errorMessage).toBe('111')
         done()
       })
     })
@@ -306,7 +306,7 @@ describe('@bugsnag/core/client', () => {
       client.notify(new Error('111'), {}, (err, event) => {
         expect(err).toBe(null)
         expect(event).toBeTruthy()
-        expect(event.errors[0].message).toBe('111')
+        expect(event.errors[0].errorMessage).toBe('111')
         done()
       })
     })

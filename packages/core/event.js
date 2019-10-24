@@ -28,8 +28,8 @@ class BugsnagEvent {
 
     this.errors = [
       {
-        class: stringOrFallback(errorClass, '[no error class]'),
-        message: stringOrFallback(errorMessage, '[no error message]'),
+        errorClass: stringOrFallback(errorClass, '[no error class]'),
+        errorMessage: stringOrFallback(errorMessage, '[no error message]'),
         type: jsRuntime,
         stacktrace: reduce(stacktrace, (accum, frame) => {
           const f = formatStackframe(frame)
@@ -78,7 +78,7 @@ class BugsnagEvent {
   toJSON () {
     return {
       payloadVersion: '4',
-      exceptions: map(this.errors, er => ({ ...er, errorClass: er.class })),
+      exceptions: map(this.errors, er => ({ ...er, message: er.errorMessage })),
       severity: this.severity,
       unhandled: this._handledState.unhandled,
       severityReason: this._handledState.severityReason,

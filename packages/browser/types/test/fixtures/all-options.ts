@@ -4,7 +4,7 @@ Bugsnag.init({
   appVersion: "1.2.3",
   appType: "worker",
   autoDetectErrors: true,
-  onError: [ () => false, (event) => { event.errors[0].class = 'diffclass' } ],
+  onError: [ () => false, (event) => { event.errors[0].errorClass = 'diffclass' } ],
   endpoints: { notify: "https://notify.bugsnag.com", sessions: "https://sessions.bugsnag.com" },
   autoTrackSessions: true,
   enabledReleaseStages: [],

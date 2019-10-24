@@ -30,7 +30,7 @@ describe('Type definitions', () => {
     client.notify(new Error('uh oh'), (event) => {
       expect(event.apiKey).toBe(undefined)
       expect(event.context).toBe(undefined)
-      expect(event.errors[0].message).toBe('uh oh')
+      expect(event.errors[0].errorMessage).toBe('uh oh')
       expect(event.errors[0].stacktrace.length > 0).toBe(true)
       event.addMetadata('abc', { def: 'ghi' })
       event.addMetadata('jkl', 'mno', 'pqr')
