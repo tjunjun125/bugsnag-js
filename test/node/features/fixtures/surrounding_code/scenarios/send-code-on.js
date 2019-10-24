@@ -17,7 +17,7 @@ function add (a) {
 add(5)(2) // -> 7
 subtract(5)(2) // -> 3
 
-bugsnagClient.notify(new Error('surround me'))
+Bugsnag.notify(new Error('surround me'))
 
 function subtract (a) {
   return function (b) {
