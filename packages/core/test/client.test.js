@@ -231,7 +231,7 @@ describe('@bugsnag/core/client', () => {
       client._delivery(client => ({ sendEvent: (payload, cb) => cb() }))
       client.notify(new Error('foobar'), (event) => {
         // the error shouldn't appear as a breadcrumb for itself
-        expect(event._breadcrumbs.length).toBe(0)
+        expect(event.breadcrumbs.length).toBe(0)
       }, () => {
         expect(client._breadcrumbs.length).toBe(1)
         expect(client._breadcrumbs[0].type).toBe('error')

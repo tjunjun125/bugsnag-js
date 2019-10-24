@@ -31,13 +31,11 @@ describe('plugin: expo device', () => {
       },
       'react-native/package.json': { version: REACT_NATIVE_VERSION }
     })
-    const c = new Client(VALID_NOTIFIER)
-    c.setOptions({ apiKey: 'api_key' })
-    c.configure()
+    const c = new Client({ apiKey: 'api_key' }, undefined, VALID_NOTIFIER)
     const before = (new Date()).toISOString()
-    c.delivery(client => ({
-      sendReport: (report) => {
-        const r = JSON.parse(JSON.stringify(report))
+    c._delivery(client => ({
+      sendEvent: (payload) => {
+        const r = JSON.parse(JSON.stringify(payload))
         expect(r).toBeTruthy()
         expect(r.events[0].device).toBeTruthy()
         const now = (new Date()).toISOString()
@@ -84,13 +82,11 @@ describe('plugin: expo device', () => {
       },
       'react-native/package.json': { version: REACT_NATIVE_VERSION }
     })
-    const c = new Client(VALID_NOTIFIER)
-    c.setOptions({ apiKey: 'api_key' })
-    c.configure()
+    const c = new Client({ apiKey: 'api_key' }, undefined, VALID_NOTIFIER)
     const before = (new Date()).toISOString()
-    c.delivery(client => ({
-      sendReport: (report) => {
-        const r = JSON.parse(JSON.stringify(report))
+    c._delivery(client => ({
+      sendEvent: (payload) => {
+        const r = JSON.parse(JSON.stringify(payload))
         expect(r).toBeTruthy()
         expect(r.events[0].device).toBeTruthy()
         const now = (new Date()).toISOString()
@@ -157,19 +153,17 @@ describe('plugin: expo device', () => {
       },
       'react-native/package.json': { version: REACT_NATIVE_VERSION }
     })
-    const c = new Client(VALID_NOTIFIER)
-    c.setOptions({ apiKey: 'api_key' })
-    c.configure()
-    const reports = []
-    c.delivery(client => ({
-      sendReport: (report) => {
-        const r = JSON.parse(JSON.stringify(report))
-        reports.push(r)
-        if (reports.length === 4) {
-          expect(reports[0].events[0].device.orientation).toBe('portrait')
-          expect(reports[1].events[0].device.orientation).toBe('landscape')
-          expect(reports[2].events[0].device.orientation).toBe('landscape')
-          expect(reports[3].events[0].device.orientation).toBe(undefined)
+    const c = new Client({ apiKey: 'api_key' }, undefined, VALID_NOTIFIER)
+    const payloads = []
+    c._delivery(client => ({
+      sendEvent: (payload) => {
+        const r = JSON.parse(JSON.stringify(payload))
+        payloads.push(r)
+        if (payloads.length === 4) {
+          expect(payloads[0].events[0].device.orientation).toBe('portrait')
+          expect(payloads[1].events[0].device.orientation).toBe('landscape')
+          expect(payloads[2].events[0].device.orientation).toBe('landscape')
+          expect(payloads[3].events[0].device.orientation).toBe(undefined)
           done()
         }
       }
