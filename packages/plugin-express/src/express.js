@@ -42,9 +42,9 @@ module.exports = {
         ), event => {
           if (metadata) event.addMetadata('error', metadata)
           event.request = { ...event.request, ...req.bugsnag.__request }
-        }, (e, report) => {
-          if (e) client.__logger.error('Failed to send report to Bugsnag')
-          req.bugsnag.config.onUncaughtException(maybeError, report, client.__logger)
+        }, (e, event) => {
+          if (e) client.__logger.error('Failed to send event to Bugsnag')
+          req.bugsnag.config.onUncaughtException(maybeError, event, client.__logger)
         })
         if (!res.headersSent) {
           res.statusCode = 500
