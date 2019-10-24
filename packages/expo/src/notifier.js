@@ -57,8 +57,8 @@ const Bugsnag = {
       switch (pl.name) {
         case 'networkBreadcrumbs':
           bugsnag.use(pl, () => [
-            bugsnag.config.endpoints.notify,
-            bugsnag.config.endpoints.sessions,
+            bugsnag._config.endpoints.notify,
+            bugsnag._config.endpoints.sessions,
             Constants.manifest.logUrl
           ])
           break

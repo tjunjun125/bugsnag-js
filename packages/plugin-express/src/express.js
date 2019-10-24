@@ -44,7 +44,7 @@ module.exports = {
           event.request = { ...event.request, ...req.bugsnag.__request }
         }, (e, event) => {
           if (e) client.__logger.error('Failed to send event to Bugsnag')
-          req.bugsnag.config.onUncaughtException(maybeError, event, client.__logger)
+          req.bugsnag._config.onUncaughtException(maybeError, event, client.__logger)
         })
         if (!res.headersSent) {
           res.statusCode = 500
