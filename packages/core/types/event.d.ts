@@ -55,8 +55,8 @@ interface Stackframe {
 }
 
 interface Error {
-  class: string;
-  message: string;
+  errorClass: string;
+  errorMessage: string;
   stacktrace: Stackframe[];
 }
 
