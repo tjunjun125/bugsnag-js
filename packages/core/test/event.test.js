@@ -81,7 +81,7 @@ describe('@bugsnag/core/event', () => {
       expect(r._metadata.metaaaaa).toBe(undefined)
 
       r.addMetadata('specific detail', 'more', null)
-      expect(r._metadata['specific detail']).toEqual({ extra: 'stuff' })
+      expect(r._metadata['specific detail']).toEqual({ extra: 'stuff', more: null })
     })
   })
 

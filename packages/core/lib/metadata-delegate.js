@@ -6,10 +6,6 @@ module.exports = {
     // addMetadata("section", null) -> clears section
     if (args[0] === null) return this.clearMetadata(section)
 
-    // TODO: what did we decide about this??
-    // addMetadata("section", "property", null) -> clears property from section
-    if (args[1] === null) return this.clearMetadata(section, args[0], args[1])
-
     // normalise the two supported input types into object form
     if (typeof args[0] === 'object') updates = args[0]
     if (typeof args[0] === 'string') updates = { [args[0]]: args[1] }
