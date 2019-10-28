@@ -229,14 +229,9 @@ class BugsnagClient {
 
   _notify (event, onError = noop, cb = noop) {
     event._context = this._context
-
     event._user = { ...this._user }
-
-    // TODO: how deep should we clone this metadata?
     event._metadata = { ...this._metadata }
-
     event.breadcrumbs = this._breadcrumbs.slice(0)
-
     this._addAppData(event)
 
     if (this._session) {
