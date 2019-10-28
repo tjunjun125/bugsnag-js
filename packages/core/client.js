@@ -2,7 +2,7 @@ const config = require('./config')
 const Event = require('./event')
 const Session = require('./session')
 const Breadcrumb = require('./breadcrumb')
-const { filter, map, includes, isArray } = require('./lib/es-utils')
+const { filter, map, includes, isArray, keys } = require('./lib/es-utils')
 const isError = require('./lib/iserror')
 const some = require('./lib/async-some')
 const createCallbackRunner = require('./lib/async-callback-runner')
@@ -101,6 +101,8 @@ class BugsnagClient {
     if (typeof conf.onError === 'function') conf.onError = [conf.onError]
     if (conf.onError && conf.onError.length) this._callbacks.onError = this._callbacks.onError.concat(conf.onError)
     if (conf.logger) this._logger(conf.logger)
+    if (conf.user) this.setUser(conf.user.id, conf.user.name, conf.user.email)
+    if (conf.metadata) map(keys(conf.metadata), k => this.addMetadata(k, conf.metadata[k]))
 
     // merge with existing config
     this._config = { ...this._config, ...conf }

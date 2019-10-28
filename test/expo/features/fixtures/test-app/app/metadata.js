@@ -5,11 +5,11 @@ import { bugsnagClient } from './bugsnag'
 export default class Metadata extends Component {
   metadataClient = () => {
     bugsnagClient.addMetadata("extra", "reason", "metadataClientName")
-    bugsnagClient.notify(new Error('MetaDataClientError'))
+    bugsnagClient.notify(new Error('MetadataClientError'))
   }
 
   metadataCallback = () => {
-    bugsnagClient.notify(new Error('MetaDataCallbackError'),
+    bugsnagClient.notify(new Error('MetadataCallbackError'),
       event => event.addMetadata('extra', 'reason', "metadataCallbackName")
     )
   }
