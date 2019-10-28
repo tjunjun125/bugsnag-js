@@ -3,7 +3,6 @@ const { intRange } = require('@bugsnag/core/lib/validators')
 const clone = require('@bugsnag/core/lib/clone-client')
 const SessionTracker = require('./tracker')
 const Backoff = require('backo')
-const Session = require('@bugsnag/core/session')
 
 module.exports = {
   init: client => {
@@ -11,9 +10,9 @@ module.exports = {
     sessionTracker.on('summary', sendSessionSummary(client))
     sessionTracker.start()
     client._sessionDelegate({
-      startSession: client => {
+      startSession: (client, session) => {
         const sessionClient = clone(client)
-        sessionClient._session = new Session()
+        sessionClient._session = session
         sessionTracker.track(sessionClient._session)
         return sessionClient
       }

@@ -1,5 +1,4 @@
 const { reduce, isArray, includes } = require('@bugsnag/core/lib/es-utils')
-const Session = require('@bugsnag/core/session')
 
 module.exports = {
   init: client => client._sessionDelegate(sessionDelegate)
@@ -9,7 +8,7 @@ const sessionDelegate = {
   startSession: (client, session) => {
     const sessionClient = client
 
-    sessionClient._session = new Session()
+    sessionClient._session = session
     sessionClient._pausedSession = null
 
     const releaseStage = sessionClient._config.releaseStage

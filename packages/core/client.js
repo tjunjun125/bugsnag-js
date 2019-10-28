@@ -141,7 +141,25 @@ class BugsnagClient {
   }
 
   startSession () {
-    return this.__sessionDelegate.startSession(this)
+    const session = new Session()
+    // run synchronous onSession callbacks
+    let ignore = false
+    const cbs = this._callbacks.onBreadcrumb.slice(0)
+    while (!ignore) {
+      if (!cbs.length) break
+      try {
+        ignore = cbs.pop()(session) === false
+      } catch (e) {
+        this.__logger.error('Error occurred in onSession callback, continuing anyway…')
+        this.__logger.error(e)
+      }
+    }
+
+    if (ignore) {
+      this.__logger.debug('Session not started due to onSession callback')
+      return this
+    }
+    return this.__sessionDelegate.startSession(this, session)
   }
 
   pauseSession () {
@@ -197,9 +215,7 @@ class BugsnagClient {
     let ignore = false
     const cbs = this._callbacks.onBreadcrumb.slice(0)
     while (!ignore) {
-      if (!cbs.length) {
-        break
-      }
+      if (!cbs.length) break
       try {
         ignore = cbs.pop()(crumb) === false
       } catch (e) {
