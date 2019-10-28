@@ -2,7 +2,7 @@ const name = 'Bugsnag Expo'
 const { version } = require('../package.json')
 const url = 'https://github.com/bugsnag/bugsnag-js'
 
-const { reduce, keys } = require('@bugsnag/core/lib/es-utils')
+const { reduce } = require('@bugsnag/core/lib/es-utils')
 
 const React = require('react')
 const Constants = require('expo-constants').default
@@ -82,7 +82,7 @@ const Bugsnag = {
   }
 }
 
-reduce(keys(Client.prototype), (accum, m) => {
+reduce(Object.getOwnPropertyNames(Client.prototype), (accum, m) => {
   if (/^_/.test(m)) return accum
   accum[m] = function () {
     if (!Bugsnag._client) return console.error(`Bugsnag.${m}(…) was called before Bugsnag.init()`)
