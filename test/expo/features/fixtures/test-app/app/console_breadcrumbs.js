@@ -4,20 +4,12 @@ import { endpoints } from './bugsnag'
 import bugsnag from '@bugsnag/expo'
 
 export default class ConsoleBreadcrumbs extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      client: null,
-      logMessage: null
-    }
-  }
-
   defaultConsoleBreadcrumbsBehaviour = () => {
     this.triggerConsoleBreadcrumbsError(
       bugsnag({
         endpoints: endpoints,
-        autoNotify: false,
-        autoCaptureSessions: false
+        autoDetectErrors: false,
+        autoTrackSessions: false
       }),
       "defaultConsoleBreadcrumbsBehaviour"
     )
@@ -27,9 +19,9 @@ export default class ConsoleBreadcrumbs extends Component {
     this.triggerConsoleBreadcrumbsError(
       bugsnag({
         endpoints: endpoints,
-        autoNotify: false,
-        autoCaptureSessions: false,
-        consoleBreadcrumbsEnabled: false
+        autoDetectErrors: false,
+        autoTrackSessions: false,
+        enabledBreadcrumbTypes: []
       }),
       "disabledConsoleBreadcrumbsBehaviour"
     )
@@ -39,9 +31,9 @@ export default class ConsoleBreadcrumbs extends Component {
     this.triggerConsoleBreadcrumbsError(
       bugsnag({
         endpoints: endpoints,
-        autoNotify: false,
-        autoCaptureSessions: false,
-        autoBreadcrumbs: false
+        autoDetectErrors: false,
+        autoTrackSessions: false,
+        enabledBreadcrumbTypes: null
       }),
       "disabledAllConsoleBreadcrumbsBehaviour"
     )
@@ -51,10 +43,9 @@ export default class ConsoleBreadcrumbs extends Component {
     this.triggerConsoleBreadcrumbsError(
       bugsnag({
         endpoints: endpoints,
-        autoNotify: false,
-        autoCaptureSessions: false,
-        autoBreadcrumbs: false,
-        consoleBreadcrumbsEnabled: true
+        autoDetectErrors: false,
+        autoTrackSessions: false,
+        enabledBreadcrumbTypes: ["console"]
       }),
       "overrideConsoleBreadcrumbsBehaviour"
     )
