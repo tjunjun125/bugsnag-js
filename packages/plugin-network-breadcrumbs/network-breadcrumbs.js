@@ -29,6 +29,8 @@ exports.init = (_client, _getIgnoredUrls = defaultIgnoredUrls, _win = window) =>
   monkeyPatchFetch()
 }
 
+exports.name = 'networkBreadcrumbs'
+
 if (process.env.NODE_ENV !== 'production') {
   exports.destroy = () => {
     restoreFunctions.forEach(fn => fn())

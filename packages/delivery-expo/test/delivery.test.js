@@ -68,7 +68,7 @@ describe('delivery: expo', () => {
         endpoints: { notify: `http://0.0.0.0:${server.address().port}/notify/` },
         redactedKeys: []
       }
-      delivery({ _config: config, __logger: noopLogger }, fetch).sendReport(payload, (err) => {
+      delivery({ _config: config, __logger: noopLogger }, fetch).sendEvent(payload, (err) => {
         expect(err).toBe(null)
         expect(requests.length).toBe(1)
         expect(requests[0].method).toBe('POST')
@@ -140,7 +140,7 @@ describe('delivery: expo', () => {
     }
     let didLog = false
     const log = () => { didLog = true }
-    delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendReport(payload, (err) => {
+    delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendEvent(payload, (err) => {
       expect(didLog).toBe(true)
       expect(err).toBeTruthy()
       expect(err.code).toBe('ECONNREFUSED')
@@ -174,7 +174,7 @@ describe('delivery: expo', () => {
       }
       let didLog = false
       const log = () => { didLog = true }
-      delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendReport(payload, (err) => {
+      delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendEvent(payload, (err) => {
         expect(didLog).toBe(true)
         expect(spiedEnqueue).not.toHaveBeenCalled()
         expect(err).toBeTruthy()
@@ -242,7 +242,7 @@ describe('delivery: expo', () => {
       }
       let didLog = false
       const log = () => { didLog = true }
-      delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendReport(payload, (err) => {
+      delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendEvent(payload, (err) => {
         expect(didLog).toBe(true)
         expect(err).toBeTruthy()
         expect(err.code).toBe('ECONNRESET')
@@ -280,7 +280,7 @@ describe('delivery: expo', () => {
       }
       let didLog = false
       const log = () => { didLog = true }
-      delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendReport(payload, (err) => {
+      delivery({ _config: config, __logger: { error: log, info: () => {} } }, fetch).sendEvent(payload, (err) => {
         expect(didLog).toBe(true)
         expect(err).toBeTruthy()
         expect(spiedEnqueue).toHaveBeenCalled()
@@ -308,7 +308,7 @@ describe('delivery: expo', () => {
       endpoints: { notify: 'https://some-address.com' },
       redactedKeys: []
     }
-    delivery({ _config: config, __logger: noopLogger }, fetch).sendReport(payload, (err) => {
+    delivery({ _config: config, __logger: noopLogger }, fetch).sendEvent(payload, (err) => {
       expect(err).not.toBeTruthy()
       expect(spiedEnqueue).toHaveBeenCalled()
       done()
@@ -396,7 +396,7 @@ describe('delivery: expo', () => {
       if (n === 2) done()
     }
     const d = delivery({ _config: config, __logger: noopLogger }, fetch)
-    d.sendReport(payload, (err) => {
+    d.sendEvent(payload, (err) => {
       expect(err).not.toBeTruthy()
       expect(spiedEnqueue).toHaveBeenCalledTimes(1)
       _done()

@@ -70,11 +70,6 @@ const Bugsnag = {
 
     bugsnag.__logger.debug('Loaded!')
 
-    bugsnag.leaveBreadcrumb = function () {
-      bugsnag.__logger.warn('Breadcrumbs are not supported in Node.js yet')
-      return this
-    }
-
     return bugsnag
   },
   init: (opts) => {
