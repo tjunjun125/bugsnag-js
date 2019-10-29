@@ -70,6 +70,8 @@ const Bugsnag = {
 
     bugsnag.__logger.debug('Loaded!')
 
+    if (bugsnag._config.autoTrackSessions) bugsnag.startSession()
+
     return bugsnag
   },
   init: (opts) => {
