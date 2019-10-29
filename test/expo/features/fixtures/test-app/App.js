@@ -72,7 +72,6 @@ export default class App extends React.Component {
 
   renderScenarioOptions() {
     return SCENARIOS.map((scenario, index) => {
-
       return <Button accessibilityLabel={scenario}
                      key={index}
                      title={'Scenario: ' + scenario}

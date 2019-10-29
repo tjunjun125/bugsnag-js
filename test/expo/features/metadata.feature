@@ -10,7 +10,7 @@ Scenario: Metadata can be set via the client
   Then I wait to receive a request
   And the exception "errorClass" equals "Error"
   And the exception "message" equals "MetadataClientError"
-  And the event "metadata.extra.reason" equals "metadataClientName"
+  And the event "metaData.extra.reason" equals "metadataClientName"
 
 Scenario: Metadata can be set via a callback
   Given the element "metadataCallbackButton" is present
@@ -18,4 +18,4 @@ Scenario: Metadata can be set via a callback
   Then I wait to receive a request
   And the exception "errorClass" equals "Error"
   And the exception "message" equals "MetadataCallbackError"
-  And the event "metadata.extra.reason" equals "metadataCallbackName"
+  And the event "metaData.extra.reason" equals "metadataCallbackName"

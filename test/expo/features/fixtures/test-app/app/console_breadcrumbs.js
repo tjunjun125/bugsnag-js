@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { View, Button } from 'react-native'
 import { endpoints } from './bugsnag'
-import bugsnag from '@bugsnag/expo'
+import Bugsnag from '@bugsnag/expo'
 
 export default class ConsoleBreadcrumbs extends Component {
   defaultConsoleBreadcrumbsBehaviour = () => {
     this.triggerConsoleBreadcrumbsError(
-      bugsnag({
+      Bugsnag.createClient({
         endpoints: endpoints,
         autoDetectErrors: false,
         autoTrackSessions: false
@@ -17,7 +17,7 @@ export default class ConsoleBreadcrumbs extends Component {
 
   disabledConsoleBreadcrumbsBehaviour = () => {
     this.triggerConsoleBreadcrumbsError(
-      bugsnag({
+      Bugsnag.createClient({
         endpoints: endpoints,
         autoDetectErrors: false,
         autoTrackSessions: false,
@@ -29,7 +29,7 @@ export default class ConsoleBreadcrumbs extends Component {
 
   disabledAllConsoleBreadcrumbsBehaviour = () => {
     this.triggerConsoleBreadcrumbsError(
-      bugsnag({
+      Bugsnag.createClient({
         endpoints: endpoints,
         autoDetectErrors: false,
         autoTrackSessions: false,
@@ -41,11 +41,11 @@ export default class ConsoleBreadcrumbs extends Component {
 
   overrideConsoleBreadcrumbsBehaviour = () => {
     this.triggerConsoleBreadcrumbsError(
-      bugsnag({
+      Bugsnag.createClient({
         endpoints: endpoints,
         autoDetectErrors: false,
         autoTrackSessions: false,
-        enabledBreadcrumbTypes: ["console"]
+        enabledBreadcrumbTypes: ["log"]
       }),
       "overrideConsoleBreadcrumbsBehaviour"
     )

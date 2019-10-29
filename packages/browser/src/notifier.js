@@ -38,8 +38,6 @@ const Bugsnag = {
     if (typeof opts === 'string') opts = { apiKey: opts }
     if (!opts) opts = {}
 
-    // support renamed/deprecated options
-
     let warningMessage = ''
 
     if (opts.endpoints && opts.endpoints.notify && !opts.endpoints.sessions) {
