@@ -27,6 +27,9 @@ const pluginNodeUnhandledRejection = require('@bugsnag/plugin-node-unhandled-rej
 const pluginIntercept = require('@bugsnag/plugin-intercept')
 const pluginContextualize = require('@bugsnag/plugin-contextualize')
 
+const fs = require('fs')
+const { join } = require('path')
+
 const plugins = [
   pluginSurroundingCode,
   pluginStripProjectRoot,
@@ -39,12 +42,24 @@ const plugins = [
   pluginContextualize
 ]
 
+const Configuration = {
+  load: () => {
+    try {
+      const pkgJson = fs.readFileSync(join(process.cwd(), 'package.json'), 'utf8')
+      const pkg = JSON.parse(pkgJson)
+      return pkg.bugsnag
+    } catch (e) {
+      throw new Error(`Could not load Bugsnag configuration from package.json due to the following error:\n │\n └  ${e.stack.split('\n').join('\n  ')}\n`)
+    }
+  }
+}
+
 const Bugsnag = {
   _client: null,
   createClient: (opts) => {
     // handle very simple use case where user supplies just the api key as a string
     if (typeof opts === 'string') opts = { apiKey: opts }
-    if (!opts) opts = {}
+    if (!opts) opts = Configuration.load()
 
     const bugsnag = new Client(opts, schema, { name, version, url })
 
@@ -86,6 +101,8 @@ module.exports.Client = Client
 module.exports.Event = Event
 module.exports.Session = Session
 module.exports.Breadcrumb = Breadcrumb
+
+module.exports.Configuration = Configuration
 
 // Export a "default" property for compatibility with ESM imports
 module.exports.default = Bugsnag

@@ -35,6 +35,7 @@ declare module "@bugsnag/core" {
 type afterErrorCb = (err: any, report: BugsnagCore.Config, logger: BugsnagCore.Logger) => void;
 
 declare const Bugsnag: AbstractTypes.BugsnagStatic;
+declare const Configuration: AbstractTypes.Configuration;
 
 export default Bugsnag;
-export { Client, Breadcrumb, Event, Session, AbstractTypes };
+export { Client, Breadcrumb, Event, Session, AbstractTypes, Configuration };
