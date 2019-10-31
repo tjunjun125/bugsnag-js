@@ -13,6 +13,7 @@ const delivery = require('@bugsnag/delivery-node')
 
 // extend the base config schema with some node-specific options
 const schema = { ...require('@bugsnag/core/config').schema, ...require('./config') }
+const loadConfig = require('./config-loader')
 
 // remove autoBreadcrumbs from the config schema
 delete schema.enabledBreadcrumbTypes
@@ -26,9 +27,6 @@ const pluginNodeUncaughtException = require('@bugsnag/plugin-node-uncaught-excep
 const pluginNodeUnhandledRejection = require('@bugsnag/plugin-node-unhandled-rejection')
 const pluginIntercept = require('@bugsnag/plugin-intercept')
 const pluginContextualize = require('@bugsnag/plugin-contextualize')
-
-const fs = require('fs')
-const { join } = require('path')
 
 const plugins = [
   pluginSurroundingCode,
@@ -45,9 +43,7 @@ const plugins = [
 const Configuration = {
   load: () => {
     try {
-      const pkgJson = fs.readFileSync(join(process.cwd(), 'package.json'), 'utf8')
-      const pkg = JSON.parse(pkgJson)
-      return pkg.bugsnag
+      return loadConfig()
     } catch (e) {
       throw new Error(`Could not load Bugsnag configuration from package.json due to the following error:\n │\n └  ${e.stack.split('\n').join('\n  ')}\n`)
     }
