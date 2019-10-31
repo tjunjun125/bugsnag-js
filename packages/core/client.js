@@ -90,10 +90,6 @@ class Client {
     this._user = { id, email, name }
   }
 
-  clearUser () {
-    this._user = {}
-  }
-
   _extractConfiguration (partialSchema = this._schema) {
     const conf = config.mergeDefaults(this._opts, partialSchema)
     const validity = config.validate(conf, partialSchema)

@@ -72,10 +72,6 @@ class Event {
     this._user = { id, email, name }
   }
 
-  clearUser () {
-    this._user = {}
-  }
-
   toJSON () {
     return {
       payloadVersion: '4',
