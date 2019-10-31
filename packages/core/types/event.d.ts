@@ -19,15 +19,15 @@ declare class Event {
   public severity: "info" | "warning" | "error";
 
   public readonly originalError: any;
+  public readonly unhandled: boolean;
 
   public apiKey?: string;
   public context?: string;
   public groupingHash?: string;
 
   // user
-  public getUser(): { id?: string; name?: string; email?: string };
-  public setUser(id: string, name?: string, email?: string): void;
-  public clearUser(): void;
+  getUser(): { id?: string; email?: string; name?: string };
+  setUser(id?: string, email?: string, name?: string): void;
 
   // metadata
   public addMetadata(section: string, values: { [key: string]: any }): void;

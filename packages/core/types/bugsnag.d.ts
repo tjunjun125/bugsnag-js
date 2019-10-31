@@ -28,9 +28,8 @@ export default interface BugsnagStatic {
   setContext(c: string): void;
 
   // user
-  getUser(): { id?: string; name?: string; email?: string };
-  setUser(id: string, name?: string, email?: string): void;
-  clearUser(): void;
+  getUser(): { id?: string; email?: string; name?: string };
+  setUser(id?: string, email?: string, name?: string): void;
 
   // reporting sesions
   startSession(): Client;

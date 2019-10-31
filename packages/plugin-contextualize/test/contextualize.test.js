@@ -55,7 +55,7 @@ describe('plugin: contextualize', () => {
         if (err) throw err
       })
     }, event => {
-      event.setUser('1a2c3cd4', 'Ben Gourley', 'ben.gourley@bugsnag.com')
+      event.setUser('1a2c3cd4', 'ben.gourley@bugsnag.com', 'Ben Gourley')
       event.severity = 'warning'
     })
   })

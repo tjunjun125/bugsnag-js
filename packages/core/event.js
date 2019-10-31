@@ -5,7 +5,7 @@ const { reduce, filter, map } = require('./lib/es-utils')
 const jsRuntime = require('./lib/js-runtime')
 const metadataDelegate = require('./lib/metadata-delegate')
 
-class BugsnagEvent {
+class Event {
   constructor (errorClass, errorMessage, stacktrace = [], originalError, handledState = defaultHandledState()) {
     this.apiKey = undefined
     this.context = undefined
@@ -14,6 +14,7 @@ class BugsnagEvent {
 
     this._handledState = handledState
     this.severity = handledState.severity
+    this.unhandled = this._handledState.unhandled
 
     this.app = {}
     this.device = {}
@@ -67,8 +68,8 @@ class BugsnagEvent {
     return this._user
   }
 
-  setUser (id, name, email) {
-    this._user = { id, name, email }
+  setUser (id, email, name) {
+    this._user = { id, email, name }
   }
 
   clearUser () {
@@ -128,7 +129,7 @@ const stringOrFallback = (str, fallback) => typeof str === 'string' && str ? str
 
 // Helpers
 
-BugsnagEvent.getStacktrace = function (error, errorFramesToSkip = 0, generatedFramesToSkip = 0) {
+Event.getStacktrace = function (error, errorFramesToSkip = 0, generatedFramesToSkip = 0) {
   if (hasStack(error)) return ErrorStackParser.parse(error).slice(errorFramesToSkip)
   // in IE11 a new Error() doesn't have a stacktrace until you throw it, so try that here
   try {
@@ -146,4 +147,4 @@ BugsnagEvent.getStacktrace = function (error, errorFramesToSkip = 0, generatedFr
   }
 }
 
-module.exports = BugsnagEvent
+module.exports = Event

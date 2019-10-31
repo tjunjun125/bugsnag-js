@@ -12,7 +12,7 @@ const metadataDelegate = require('./lib/metadata-delegate')
 const LOG_USAGE_ERR_PREFIX = 'Usage error.'
 const REPORT_USAGE_ERR_PREFIX = 'Bugsnag usage error.'
 
-class BugsnagClient {
+class Client {
   constructor (configuration, schema = config.schema, notifier) {
     this._notifier = notifier
 
@@ -31,6 +31,8 @@ class BugsnagClient {
     this.__sessionDelegate = { startSession: () => this, pauseSession: noop, resumeSession: noop }
 
     this._session = null
+    this._pausedSession = null
+
     this._breadcrumbs = []
     this._context = undefined
     this._metadata = {}
@@ -51,7 +53,7 @@ class BugsnagClient {
     this.Breadcrumb = Breadcrumb
     this.Event = Event
     this.Session = Session
-    this.Client = BugsnagClient
+    this.Client = Client
 
     var self = this
     var notify = this.notify
@@ -84,8 +86,8 @@ class BugsnagClient {
     return this._user
   }
 
-  setUser (id, name, email) {
-    this._user = { id, name, email }
+  setUser (id, email, name) {
+    this._user = { id, email, name }
   }
 
   clearUser () {
@@ -98,10 +100,19 @@ class BugsnagClient {
 
     if (!validity.valid === true) throw new Error(generateConfigErrorMessage(validity.errors))
 
+    // ensure all callbacks are arrays
     if (typeof conf.onError === 'function') conf.onError = [conf.onError]
+    if (typeof conf.onBreadcrumb === 'function') conf.onBreadcrumb = [conf.onBreadcrumb]
+    if (typeof conf.onSession === 'function') conf.onSession = [conf.onSession]
+
+    // add callbacks
     if (conf.onError && conf.onError.length) this._callbacks.onError = this._callbacks.onError.concat(conf.onError)
+    if (conf.onBreadcrumb && conf.onBreadcrumb.length) this._callbacks.onBreadcrumb = this._callbacks.onBreadcrumb.concat(conf.onBreadcrumb)
+    if (conf.onSession && conf.onSession.length) this._callbacks.onSession = this._callbacks.onSession.concat(conf.onSession)
+
+    if (conf.context) this._context = conf.context
     if (conf.logger) this._logger(conf.logger)
-    if (conf.user) this.setUser(conf.user.id, conf.user.name, conf.user.email)
+    if (conf.user) this.setUser(conf.user.id, conf.user.email, conf.user.name)
     if (conf.metadata) map(keys(conf.metadata), k => this.addMetadata(k, conf.metadata[k]))
 
     // merge with existing config
@@ -240,7 +251,7 @@ class BugsnagClient {
 
   notify (error, onError, cb) {
     // ensure we have an error (or a reasonable object representation of an error)
-    const { err, errorFramesToSkip } = normalizError(error, this.__logger, this._depth)
+    const { err, errorFramesToSkip } = normalizeError(error, this.__logger, this._depth)
     const event = new Event(err.name, err.message, Event.getStacktrace(err, errorFramesToSkip, 2 + this._depth), error)
     return this._notify(event, onError, cb)
   }
@@ -258,7 +269,7 @@ class BugsnagClient {
     }
 
     // exit early if the reports should not be sent on the current releaseStage
-    if (isArray(this._config.enabledReleaseStages) && !includes(this._config.enabledReleaseStages, this._config.releaseStage)) {
+    if (isArray(this._config.enabledReleaseStages) && this._config.enabledReleaseStages.length > 0 && !includes(this._config.enabledReleaseStages, this._config.releaseStage)) {
       this.__logger.warn('Event not sent due to releaseStage/enabledReleaseStages configuration')
       return cb(null, event)
     }
@@ -279,7 +290,7 @@ class BugsnagClient {
         return cb(null, event)
       }
 
-      BugsnagClient.prototype.leaveBreadcrumb.call(this, event.errors[0].errorClass, {
+      Client.prototype.leaveBreadcrumb.call(this, event.errors[0].errorClass, {
         errorClass: event.errors[0].errorClass,
         errorMessage: event.errors[0].errorMessage,
         severity: event.severity
@@ -298,7 +309,7 @@ class BugsnagClient {
   }
 }
 
-const normalizError = (error, logger, depth) => {
+const normalizeError = (error, logger, depth) => {
   const synthesizedErrorFramesToSkip = 3 + depth
 
   const createAndLogUsageError = reason => {
@@ -350,4 +361,4 @@ const generateNotifyUsageMessage = actual =>
 
 const stringify = val => typeof val === 'object' ? JSON.stringify(val) : String(val)
 
-module.exports = BugsnagClient
+module.exports = Client

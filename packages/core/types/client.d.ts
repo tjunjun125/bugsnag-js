@@ -14,7 +14,7 @@ declare class Client {
   ): void;
 
   // breadcrumbs
-  public leaveBreadcrumb(message: string, metadata?: any, type?: string, timestamp?: string): void;
+  public leaveBreadcrumb(message: string, metadata?: any, type?: string): void;
 
   // metadata
   public addMetadata(section: string, values: { [key: string]: any }): void;
@@ -27,9 +27,8 @@ declare class Client {
   public setContext(c: string): void;
 
   // user
-  public getUser(): { id?: string; name?: string; email?: string };
-  public setUser(id: string, name?: string, email?: string): void;
-  public clearUser(): void;
+  public getUser(): { id?: string; email?: string; name?: string };
+  public setUser(id?: string, email?: string, name?: string): void;
 
   // reporting sesions
   public startSession(): Client;
