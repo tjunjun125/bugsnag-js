@@ -110,6 +110,7 @@ class Client {
     if (conf.onBreadcrumb && conf.onBreadcrumb.length) this._callbacks.onBreadcrumb = this._callbacks.onBreadcrumb.concat(conf.onBreadcrumb)
     if (conf.onSession && conf.onSession.length) this._callbacks.onSession = this._callbacks.onSession.concat(conf.onSession)
 
+    if (conf.context) this._context = conf.context
     if (conf.logger) this._logger(conf.logger)
     if (conf.user) this.setUser(conf.user.id, conf.user.email, conf.user.name)
     if (conf.metadata) map(keys(conf.metadata), k => this.addMetadata(k, conf.metadata[k]))

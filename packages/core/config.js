@@ -33,6 +33,11 @@ module.exports.schema = {
     message: 'should be true|false',
     validate: (value) => value === true || value === false || value === undefined
   },
+  context: {
+    defaultValue: () => undefined,
+    message: 'should be a string',
+    validate: value => value === undefined || stringWithLength(value)
+  },
   onError: listOfCallbacks,
   onBreadcrumb: listOfCallbacks,
   onSession: listOfCallbacks,
