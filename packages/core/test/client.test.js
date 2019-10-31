@@ -122,18 +122,15 @@ describe('@bugsnag/core/client', () => {
       process.nextTick(() => done())
     })
 
-    it('supports preventing send with enabledReleaseStages is empty', done => {
+    it('doesn’t prevent send when enabledReleaseStages is empty', done => {
       const client = new Client({ apiKey: 'API_KEY_YEAH', enabledReleaseStages: [] }, undefined, VALID_NOTIFIER)
       client._delivery(client => ({
         sendEvent: (payload) => {
-          fail('sendEvent() should not be called')
+          done()
         }
       }))
 
       client.notify(new Error('oh wow'))
-
-      // give the event loop a tick to see if the reports get send
-      process.nextTick(() => done())
     })
 
     it('supports preventing send when releaseStage is not it enabledReleaseStages', done => {
@@ -173,7 +170,7 @@ describe('@bugsnag/core/client', () => {
       client.notify(new Error('oh wow'))
     })
 
-    it('populates client.app.version if config.appVersion is supplied', done => {
+    it('populates event.app.version if config.appVersion is supplied', done => {
       const client = new Client({ apiKey: 'API_KEY_YEAH', appVersion: '1.2.3' }, undefined, VALID_NOTIFIER)
       client._delivery(client => ({
         sendEvent: (payload) => {

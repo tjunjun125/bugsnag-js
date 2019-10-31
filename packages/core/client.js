@@ -260,7 +260,7 @@ class Client {
     }
 
     // exit early if the reports should not be sent on the current releaseStage
-    if (isArray(this._config.enabledReleaseStages) && !includes(this._config.enabledReleaseStages, this._config.releaseStage)) {
+    if (isArray(this._config.enabledReleaseStages) && this._config.enabledReleaseStages.length > 0 && !includes(this._config.enabledReleaseStages, this._config.releaseStage)) {
       this.__logger.warn('Event not sent due to releaseStage/enabledReleaseStages configuration')
       return cb(null, event)
     }
