@@ -14,6 +14,7 @@ class BugsnagEvent {
 
     this._handledState = handledState
     this.severity = handledState.severity
+    this.unhandled = this._handledState.unhandled
 
     this.app = {}
     this.device = {}

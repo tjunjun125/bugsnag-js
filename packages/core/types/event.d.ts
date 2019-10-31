@@ -19,6 +19,7 @@ declare class Event {
   public severity: "info" | "warning" | "error";
 
   public readonly originalError: any;
+  public readonly unhandled: boolean;
 
   public apiKey?: string;
   public context?: string;
