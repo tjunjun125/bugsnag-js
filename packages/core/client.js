@@ -242,7 +242,7 @@ class Client {
 
   notify (error, onError, cb) {
     // ensure we have an error (or a reasonable object representation of an error)
-    const { err, errorFramesToSkip } = normalizError(error, this.__logger, this._depth)
+    const { err, errorFramesToSkip } = normalizeError(error, this.__logger, this._depth)
     const event = new Event(err.name, err.message, Event.getStacktrace(err, errorFramesToSkip, 2 + this._depth), error)
     return this._notify(event, onError, cb)
   }
@@ -300,7 +300,7 @@ class Client {
   }
 }
 
-const normalizError = (error, logger, depth) => {
+const normalizeError = (error, logger, depth) => {
   const synthesizedErrorFramesToSkip = 3 + depth
 
   const createAndLogUsageError = reason => {
