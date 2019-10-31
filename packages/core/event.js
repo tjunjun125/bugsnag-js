@@ -67,8 +67,8 @@ class BugsnagEvent {
     return this._user
   }
 
-  setUser (id, name, email) {
-    this._user = { id, name, email }
+  setUser (id, email, name) {
+    this._user = { id, email, name }
   }
 
   clearUser () {

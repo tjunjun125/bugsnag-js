@@ -86,8 +86,8 @@ class Client {
     return this._user
   }
 
-  setUser (id, name, email) {
-    this._user = { id, name, email }
+  setUser (id, email, name) {
+    this._user = { id, email, name }
   }
 
   clearUser () {
@@ -103,7 +103,7 @@ class Client {
     if (typeof conf.onError === 'function') conf.onError = [conf.onError]
     if (conf.onError && conf.onError.length) this._callbacks.onError = this._callbacks.onError.concat(conf.onError)
     if (conf.logger) this._logger(conf.logger)
-    if (conf.user) this.setUser(conf.user.id, conf.user.name, conf.user.email)
+    if (conf.user) this.setUser(conf.user.id, conf.user.email, conf.user.name)
     if (conf.metadata) map(keys(conf.metadata), k => this.addMetadata(k, conf.metadata[k]))
 
     // merge with existing config

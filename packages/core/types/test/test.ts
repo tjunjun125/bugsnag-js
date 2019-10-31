@@ -93,11 +93,11 @@ describe('Type definitions', () => {
     expect(client.getContext()).toBe('foo')
   })
 
-  it('works setting user', () => {
+  it('works setting/clearing user', () => {
     const client = createClient({ apiKey: 'API_KEY' })
-    client.setUser('123', 'Ben', 'ben.gourley@bugsnag.com')
+    client.setUser('123', 'ben.gourley@bugsnag.com', 'Ben')
     expect(client.getUser()).toEqual({ id: '123', name: 'Ben', email: 'ben.gourley@bugsnag.com' })
-    client.clearUser()
-    expect(client.getUser()).toEqual({})
+    client.setUser(undefined, undefined, undefined)
+    expect(client.getUser()).toEqual({ id: undefined, name: undefined, email: undefined })
   })
 })

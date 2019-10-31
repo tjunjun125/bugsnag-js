@@ -27,9 +27,8 @@ declare class Client {
   public setContext(c: string): void;
 
   // user
-  public getUser(): { id?: string; name?: string; email?: string };
-  public setUser(id: string, name?: string, email?: string): void;
-  public clearUser(): void;
+  public getUser(): { id?: string; email?: string; name?: string };
+  public setUser(id?: string, email?: string, name?: string): void;
 
   // reporting sesions
   public startSession(): Client;

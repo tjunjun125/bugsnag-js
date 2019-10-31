@@ -4,13 +4,13 @@ import { bugsnagClient } from './bugsnag'
 
 export default class User extends Component {
   userClient = () => {
-    bugsnagClient.setUser("123", "userClientName")
+    bugsnagClient.setUser("123", "bug@sn.ag", "userClientName")
     bugsnagClient.notify(new Error('UserClientError'))
   }
 
   userCallback = () => {
     bugsnagClient.notify(new Error('UserCallbackError'), event => {
-      event.setUser("123", "userCallbackName")
+      event.setUser("123", "bug@sn.ag", "userCallbackName")
     })
   }
 
