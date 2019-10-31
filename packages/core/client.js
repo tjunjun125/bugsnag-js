@@ -31,6 +31,8 @@ class Client {
     this.__sessionDelegate = { startSession: () => this, pauseSession: noop, resumeSession: noop }
 
     this._session = null
+    this._pausedSession = null
+
     this._breadcrumbs = []
     this._context = undefined
     this._metadata = {}

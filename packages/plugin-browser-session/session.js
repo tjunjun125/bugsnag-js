@@ -49,6 +49,7 @@ const sessionDelegate = {
   },
   pauseSession: client => {
     client._pausedSession = client._session
+    client._session = null
   },
   resumeSession: client => {
     client._session = client._pausedSession
