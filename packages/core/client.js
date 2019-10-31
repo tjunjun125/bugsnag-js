@@ -100,8 +100,16 @@ class Client {
 
     if (!validity.valid === true) throw new Error(generateConfigErrorMessage(validity.errors))
 
+    // ensure all callbacks are arrays
     if (typeof conf.onError === 'function') conf.onError = [conf.onError]
+    if (typeof conf.onBreadcrumb === 'function') conf.onBreadcrumb = [conf.onBreadcrumb]
+    if (typeof conf.onSession === 'function') conf.onSession = [conf.onSession]
+
+    // add callbacks
     if (conf.onError && conf.onError.length) this._callbacks.onError = this._callbacks.onError.concat(conf.onError)
+    if (conf.onBreadcrumb && conf.onBreadcrumb.length) this._callbacks.onBreadcrumb = this._callbacks.onBreadcrumb.concat(conf.onBreadcrumb)
+    if (conf.onSession && conf.onSession.length) this._callbacks.onSession = this._callbacks.onSession.concat(conf.onSession)
+
     if (conf.logger) this._logger(conf.logger)
     if (conf.user) this.setUser(conf.user.id, conf.user.email, conf.user.name)
     if (conf.metadata) map(keys(conf.metadata), k => this.addMetadata(k, conf.metadata[k]))

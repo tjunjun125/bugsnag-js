@@ -1,6 +1,12 @@
 const { filter, reduce, keys, isArray, includes } = require('./lib/es-utils')
 const { intRange, stringWithLength, arrayOfStrings } = require('./lib/validators')
 
+const listOfCallbacks = {
+  defaultValue: () => [],
+  message: 'should be a function or array of functions',
+  validate: value => typeof value === 'function' || (isArray(value) && filter(value, f => typeof f === 'function').length === value.length)
+}
+
 module.exports.schema = {
   apiKey: {
     defaultValue: () => null,
@@ -27,11 +33,9 @@ module.exports.schema = {
     message: 'should be true|false',
     validate: (value) => value === true || value === false || value === undefined
   },
-  onError: {
-    defaultValue: () => [],
-    message: 'should be a function or array of functions',
-    validate: value => typeof value === 'function' || (isArray(value) && filter(value, f => typeof f === 'function').length === value.length)
-  },
+  onError: listOfCallbacks,
+  onBreadcrumb: listOfCallbacks,
+  onSession: listOfCallbacks,
   endpoints: {
     defaultValue: () => ({
       notify: 'https://notify.bugsnag.com',
