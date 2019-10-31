@@ -12,7 +12,7 @@ const metadataDelegate = require('./lib/metadata-delegate')
 const LOG_USAGE_ERR_PREFIX = 'Usage error.'
 const REPORT_USAGE_ERR_PREFIX = 'Bugsnag usage error.'
 
-class BugsnagClient {
+class Client {
   constructor (configuration, schema = config.schema, notifier) {
     this._notifier = notifier
 
@@ -51,7 +51,7 @@ class BugsnagClient {
     this.Breadcrumb = Breadcrumb
     this.Event = Event
     this.Session = Session
-    this.Client = BugsnagClient
+    this.Client = Client
 
     var self = this
     var notify = this.notify
@@ -279,7 +279,7 @@ class BugsnagClient {
         return cb(null, event)
       }
 
-      BugsnagClient.prototype.leaveBreadcrumb.call(this, event.errors[0].errorClass, {
+      Client.prototype.leaveBreadcrumb.call(this, event.errors[0].errorClass, {
         errorClass: event.errors[0].errorClass,
         errorMessage: event.errors[0].errorMessage,
         severity: event.severity
@@ -350,4 +350,4 @@ const generateNotifyUsageMessage = actual =>
 
 const stringify = val => typeof val === 'object' ? JSON.stringify(val) : String(val)
 
-module.exports = BugsnagClient
+module.exports = Client
