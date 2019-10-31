@@ -14,7 +14,7 @@ declare class Client {
   ): void;
 
   // breadcrumbs
-  public leaveBreadcrumb(message: string, metadata?: any, type?: string, timestamp?: string): void;
+  public leaveBreadcrumb(message: string, metadata?: any, type?: string): void;
 
   // metadata
   public addMetadata(section: string, values: { [key: string]: any }): void;
