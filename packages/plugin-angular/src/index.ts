@@ -1,16 +1,12 @@
 import { ErrorHandler, Injectable } from "@angular/core";
-import Bugsnag, { Client, Event, AbstractTypes } from "@bugsnag/js";
+import { Client, Event, AbstractTypes } from "@bugsnag/js";
 
 @Injectable()
 export class BugsnagErrorHandler extends ErrorHandler {
   public bugsnagClient: Client;
-  constructor(client?: Client) {
+  constructor(bugsnagClient: Client) {
     super();
-    if (client) {
-      this.bugsnagClient = client;
-    } else {
-      this.bugsnagClient = ((Bugsnag as any)._client as Client)
-    }
+    this.bugsnagClient = bugsnagClient;
   }
 
   public handleError(error: any): void {

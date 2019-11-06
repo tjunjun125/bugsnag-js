@@ -26,15 +26,15 @@ export default {
     }
   },
   methods: {
-    // Tell the bugsnagClient about an error that was handled
+    // Tell Bugsnag about an error that was handled
     sendHandled: function () {
       try {
         throw new Error('Catch me if you can')
       } catch (e) {
-        this.$bugsnag.notify(e)
+        this.$Bugsnag.notify(e)
       }
     },
-    // Throws an error outside in a timer which will be reported by the bugsnagClient
+    // Throws an error outside in a timer which will be reported by Bugsnag
     sendUnhandled: function () {
       setTimeout(() => {
         throw new Error('Crashy')

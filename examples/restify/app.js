@@ -1,12 +1,12 @@
 const restify = require('restify')
-const bugsnag = require('@bugsnag/js')
+const Bugsnag = require('@bugsnag/js')
 const { readFileSync } = require('fs')
 
-const bugsnagClient = bugsnag(process.env.BUGSNAG_API_KEY)
-bugsnagClient.use(require('@bugsnag/plugin-restify'))
+Bugsnag.init(process.env.BUGSNAG_API_KEY)
+Bugsnag.use(require('@bugsnag/plugin-restify'))
 
 const server = restify.createServer()
-const { requestHandler, errorHandler } = bugsnagClient.getPlugin('restify')
+const { requestHandler, errorHandler } = Bugsnag.getPlugin('restify')
 
 const index = readFileSync(`${__dirname}/views/index.html`, 'utf8')
 
@@ -31,7 +31,7 @@ server.post('/unhandled', (req, res, next) => {
 })
 
 server.post('/add-info', (req, res, next) => {
-  req.bugsnag.user = { id: '123', name: 'jim' }
+  req.bugsnag.setUser('123', 'jim@jim.com', 'jim')
   next(new Error('Cannot load Jim’s items'))
 })
 

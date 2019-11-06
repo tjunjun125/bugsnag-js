@@ -1,8 +1,8 @@
 // include Bugsnag from the installed dependencies
-var bugsnag = require('@bugsnag/js')
+var Bugsnag = require('@bugsnag/js')
 
 // initialise Bugsnag with some basic options
-var bugsnagClient = bugsnag({
+Bugsnag.init({
   // this loads the apiKey from the environment so be sure to pass it in
   apiKey: process.env.BUGSNAG_API_KEY,
   // setting the appVersion is useful to track when errors are introduced/fixed
@@ -10,9 +10,9 @@ var bugsnagClient = bugsnag({
   // using a combination of releaseStage/notifyReleaseStages you can ensure you
   // only get reports from the environments you care about
   releaseStage: 'production',
-  notifyReleaseStages: [ 'staging', 'production' ],
-  // you can set global metaData when you initialise Bugsnag
-  metaData: {}
+  enabledReleaseStages: [ 'staging', 'production' ],
+  // you can set global metadata when you initialise Bugsnag
+  metadata: {}
 })
 
 console.log(`
@@ -29,7 +29,7 @@ console.log(`
   l = (l)eave a breadcrumb
     Calls the leaveBreadcrumb() method.
 
-  b = calling notify with a (b)efore send callback
+  o = calling notify with an (o)n error callback
     Runs custom logic before a report is sent. This contrived example will
     pseudo-randomly prevent 50% of the reports from sending.
 `)
@@ -41,7 +41,7 @@ process.stdin.on('data', function (d) {
     case 'u': return unhandledError()
     case 'h': return handledError()
     case 'l': return leaveBreadcrumb()
-    case 'b': return beforeSend()
+    case 'o': return onError()
     default: return unknown(d)
   }
 })
@@ -59,24 +59,22 @@ function unhandledError () {
 function handledError () {
   console.log('notifying of a handled error…')
   // you can notify Bugsnag of errors you handled or created yourself
-  bugsnagClient.notify(new Error('scheduling clash'))
+  Bugsnag.notify(new Error('scheduling clash'))
 }
 
 function leaveBreadcrumb () {
   console.log('leaving a breadcrumb…')
   // you can record all kinds of events which will be sent along with error reports
   // these can help when trying to understand the conditions leading up to an error
-  bugsnagClient.leaveBreadcrumb('network blip')
+  Bugsnag.leaveBreadcrumb('network blip')
 }
 
-function beforeSend () {
-  console.log('calling notify() with a beforeSend callback…')
-  // beforeSend can be used to modify a report or prevent it from being sent at all
+function onError () {
+  console.log('calling notify() with a onError callback…')
+  // onError can be used to modify a report or prevent it from being sent at all
   // this example pseudo-randomly filters out approximately half of the reports
-  bugsnagClient.notify(new Error('sometimes will send'), {
-    beforeSend: (report) => {
-      const n = Math.random()
-      if (n <= 0.5) report.ignore()
-    }
+  Bugsnag.notify(new Error('sometimes will send'), (event) => {
+    const n = Math.random()
+    if (n <= 0.5) return false
   })
 }

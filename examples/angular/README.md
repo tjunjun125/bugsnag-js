@@ -15,8 +15,7 @@ cd bugsnag-js/examples/angular
 
 Take a look at…
 
-- [`src/app/bugsnag.ts`](src/app/bugsnag.ts) for how to setup Bugsnag once for your application so it can be imported and used anywhere
-- [`src/app/app.module.ts`](src/app/app.module.ts) to see how the above module is loaded and the BugsnagErrorHandler is applied to the Angular app
+- [`src/app/app.module.ts`](src/app/app.module.ts) to see how Bugsnag is loaded and initialized, and how the BugsnagErrorHandler is applied to the Angular app
 - [`src/app/app.component.ts`](src/app/app.component.ts) to see how the errors are triggered
 
 ### With docker
@@ -28,7 +27,7 @@ docker build -t bugsnag-js-example-angular . && \
 docker run -p 4200:4200 -it bugsnag-js-example-angular
 ```
 
-__Note__: remember to replace `YOUR_API_KEY` in `src/lib/bugsnag.js` with your own!
+__Note__: remember to replace `YOUR_API_KEY` in `src/app/app.component.ts` with your own!
 
 ### Without docker
 Ensure you have a version of Node.js >=4 on your machine.
@@ -38,4 +37,4 @@ npm install
 npm run serve
 ```
 
-__Note__: remember to replace `YOUR_API_KEY` in `src/app/bugsnag.ts` with your own!
+__Note__: remember to replace `YOUR_API_KEY` in `src/app/app.component.ts` with your own!

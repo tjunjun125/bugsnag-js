@@ -15,7 +15,7 @@ document.getElementById('jsUnhandled').addEventListener('click', sendUnhandled)
 
 // Initialize Bugsnag to begin tracking errors. Only an api key is required, but
 // here are some other helpful configuration details:
-var bugsnagClient = bugsnag({
+Bugsnag.init({
   // get your own api key at bugsnag.com
   apiKey: '6eccabc796ef28a154314498f79b724e',
 
@@ -24,26 +24,26 @@ var bugsnagClient = bugsnag({
 
   // Bugsnag can track the number of “sessions” that happen in your application,
   // and calculate a crash rate for each release. This defaults to false.
-  autoCaptureSessions: true,
+  autoTrackSessions: true,
 
   // defines the release stage for all events that occur in this app.
   releaseStage: 'development',
 
-  //  defines which release stages bugsnag should report. e.g. ignore staging errors.
-  notifyReleaseStages: [ 'development', 'production' ],
+  // defines which release stages bugsnag should report. e.g. ignore staging errors.
+  enabledReleaseStages: [ 'development', 'production' ],
 
   // one of the most powerful tools in our library, beforeSend lets you evaluate,
   // modify, add and remove data before sending the error to bugsnag. The actions
   // here will be applied to *all* errors, handled and unhandled.
-  beforeSend: function (report) {
+  onError: function (event) {
     // the below downgrades handled exceptions sent with the generic "Error"
     // class to info. In this example, it only affects the notification called
     // at the very end of this app.js.
-    if (report.errorClass === 'Error' && report.severity === 'warning') {
-      report.severity = 'info'
+    if (event.errors[0].errorClass === 'Error' && event.severity === 'warning') {
+      event.severity = 'info'
     }
     // note that if you return false from the beforeSend,
-    // this will cancel the entire error report.
+    // this will cancel the entire error event.
   },
 
   // attached any user data you'd like to report.
@@ -55,7 +55,7 @@ var bugsnagClient = bugsnag({
 
   // add any custom attributes relevant to your app. Note that metadata can be
   // added here, in a specific notify() or in a beforeSend.
-  metaData: {
+  metadata: {
     company: {
       name: "Xavier's School for Gifted Youngsters"
     }
@@ -77,12 +77,12 @@ function sendHandled () {
   } catch (e) {
     console.log('a handled error with metadata has been reported to your Bugsnag dashboard')
 
-    bugsnagClient.notify(e, {
+    Bugsnag.notify(e, {
       context: 'a handled ReferenceError with metadata',
       // Note that metadata can be declared globally, in the notification (as below) or in a beforeSend.
       // The below metadata will be supplemented (not replaced) by the metadata
       // in the beforeSend method. See our docs if you prefer to overwrite/remove metadata.
-      metaData: {
+      metadata: {
         details: {
           info: 'Any important details specific to the context of this particular error/function.'}
       }
@@ -100,4 +100,4 @@ function sendUnhandled () {
 }
 
 // below is the simplest notification syntax, akin to logging.
-window.bugsnagClient.notify('End of file')
+window.Bugsnag.notify('End of file')

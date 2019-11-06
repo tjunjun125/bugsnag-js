@@ -1,4 +1,4 @@
-import bugsnagClient from '../lib/bugsnag'
+import Bugsnag from '@bugsnag/js'
 import React from 'react'
 
 class BadButtons extends React.Component {
@@ -15,8 +15,8 @@ class BadButtons extends React.Component {
       throw new Error('Bad Thing!')
     } catch (e) {
       console.log('a handled error was sent to our dashboard.')
-      bugsnagClient.notify(e, {
-        context: 'Don’t worry - I handled it.'
+      Bugsnag.notify(e, event => {
+        event.context = 'Don’t worry - I handled it.'
       })
     }
   }

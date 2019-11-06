@@ -1,12 +1,12 @@
-const bugsnag = require('@bugsnag/js')
+const Bugsnag = require('@bugsnag/js')
 const express = require('express')
 const { readFileSync } = require('fs')
 
-const bugsnagClient = bugsnag(process.env.BUGSNAG_API_KEY)
-bugsnagClient.use(require('@bugsnag/plugin-express'))
+Bugsnag.init(process.env.BUGSNAG_API_KEY)
+Bugsnag.use(require('@bugsnag/plugin-express'))
 
 const app = express()
-const { requestHandler, errorHandler } = bugsnagClient.getPlugin('express')
+const { requestHandler, errorHandler } = Bugsnag.getPlugin('express')
 
 app.use(requestHandler)
 
@@ -31,7 +31,7 @@ app.post('/handled', (req, res) => {
 })
 
 app.post('/add-info', (req, res, next) => {
-  req.bugsnag.user = { id: '123', name: 'jim' }
+  req.bugsnag.setUser('123', 'jim@jim.com', 'jim')
   next(new Error('Cannot load Jim’s items'))
 })
 
