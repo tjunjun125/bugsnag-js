@@ -33,14 +33,6 @@ module.exports = (opts) => {
   // handle very simple use case where user supplies just the api key as a string
   if (typeof opts === 'string') opts = { apiKey: opts }
 
-  // support renamed/deprecated options
-
-  let warningMessage = ''
-
-  if (opts.endpoints && opts.endpoints.notify && !opts.endpoints.sessions) {
-    warningMessage += 'notify endpoint is set but sessions endpoint is not. No sessions will be sent.'
-  }
-
   const bugsnag = new Client({ name, version, url })
 
   bugsnag.setOptions(opts)
@@ -51,8 +43,6 @@ module.exports = (opts) => {
   // configure with user supplied options
   // errors can be thrown here that prevent the lib from being in a useable state
   bugsnag.configure(schema)
-
-  if (warningMessage) bugsnag._logger.warn(warningMessage)
 
   // always-on browser-specific plugins
   bugsnag.use(pluginDevice)
