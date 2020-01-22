@@ -1,5 +1,26 @@
 # Changelog
 
+## TBD
+
+### Changed
+
+- (node): Use `util.inspect()` on plain object errors when logging their value [#696](https://github.com/bugsnag/bugsnag-js/pull/696) 
+
+## 6.5.1 (2020-01-08)
+
+### Fixed
+- (expo): Pin `@react-native-community/netinfo` dependency to exact version bundled by Expo [#691](https://github.com/bugsnag/bugsnag-js/pull/691)
+- (plugin-express), (plugin-restify): Send request metadata as the correct `notify()` parameter [#687](https://github.com/bugsnag/bugsnag-js/pull/687)
+
+## 6.5.0 (2019-12-16)
+
+### Added
+- (expo): Add support for breaking changes in Expo SDK v36 [#670](https://github.com/bugsnag/bugsnag-js/pull/670)
+- (expo-cli): Choose a compatible version of @bugnsnag/expo for SDK v33-35 [#670](https://github.com/bugsnag/bugsnag-js/pull/670)
+
+### Fixed
+- (plugin-network-breadcrumbs): Fixes the `window.fetch` monkey-patch to also accept `Request`. [#662](https://github.com/bugsnag/bugsnag-js/pull/662)
+
 ## 6.4.3 (2019-10-21)
 
 ### Fixed
