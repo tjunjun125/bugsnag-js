@@ -20,7 +20,6 @@ steps:
           cache-from:
             - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-base-${BRANCH_NAME}
             - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-base
-      - docker-compose#v3.1.0:
           push:
             - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-base-${BRANCH_NAME}
             - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-base
@@ -67,6 +66,9 @@ steps:
           image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
           cache-from:
             - browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-browser-${BRANCH_NAME}
+            - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-base-${BRANCH_NAME}
+          push:
+            - browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-browser-${BRANCH_NAME}
 
   - label:  ':docker: Build node maze runner image'
     timeout_in_minutes: 20
@@ -78,6 +80,9 @@ steps:
             - node-maze-runner
           image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
           cache-from:
+            - node-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-node-${BRANCH_NAME}
+            - ci:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-base-${BRANCH_NAME}
+          push:
             - node-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-node-${BRANCH_NAME}
 
   - wait
