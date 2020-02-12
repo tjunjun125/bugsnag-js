@@ -5,7 +5,7 @@ RUN apk add --update bash
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
 COPY babel.config.js tslint.json lerna.json ./
