@@ -84,6 +84,40 @@ class BugsnagReactNative(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun dispatch(payload: ReadableMap, promise: Promise) {
+        val context = payload.getString("context")
+        val groupingHash = payload.getString("groupingHash")
+        val unhandled = payload.getBoolean("unhandled")
+
+
+//        TODO serialize the below
+
+//        errors	Error[]
+        val errors = payload.getArray("errors")
+
+//        severity	string
+        val severity = payload.getString("severity")
+
+//        severityReason	SeverityReason
+
+
+//        app	AppWithState
+        val app = payload.getMap("app")
+
+//        device	DeviceWithState
+        val device = payload.getMap("device")
+
+//        breadcrumbs	Breadcrumb[]
+        val breadcrumbs = payload.getArray("breadcrumbs")
+
+//        user User
+        val user = payload.getMap("user")
+
+//        metadata	Map<string, MetadataSection>
+        val metadata = payload.getMap("metadata")
+
+//        threads	Thread[]
+        val threads = payload.getArray("threads")
+
         client.notify(RuntimeException("TODO")) {
             // TODO modify payload here
             true
