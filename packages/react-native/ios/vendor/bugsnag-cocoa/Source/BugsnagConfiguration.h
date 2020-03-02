@@ -28,46 +28,54 @@
 
 #import "BSG_KSCrashReportWriter.h"
 #import "BugsnagBreadcrumb.h"
-#import "BugsnagCrashReport.h"
-#import "BugsnagMetaData.h"
+#import "BugsnagEvent.h"
+#import "BugsnagMetadata.h"
 
 @class BugsnagBreadcrumbs;
 @class BugsnagUser;
+
+/**
+ * BugsnagConfiguration error constants
+ */
+extern NSString * _Nonnull const BSGConfigurationErrorDomain;
+typedef NS_ENUM(NSInteger, BSGConfigurationErrorCode) {
+    BSGConfigurationErrorInvalidApiKey = 0
+};
 
 /**
  *  A configuration block for modifying an error report
  *
  *  @param report The default report
  */
-typedef void (^BugsnagNotifyBlock)(BugsnagCrashReport *_Nonnull report);
+typedef void (^BugsnagOnErrorBlock)(BugsnagEvent *_Nonnull report);
 
 /**
  *  A handler for modifying data before sending it to Bugsnag.
  *
- * beforeSendBlocks will be invoked on a dedicated
+ * onSendBlocks will be invoked on a dedicated
  * background queue, which will be different from the queue where the block was originally added.
  *
  *  @param rawEventData The raw event data written at crash time. This
- *                      includes data added in onCrashHandler.
+ *                      includes data added in onError.
  *  @param reports      The report generated from the rawEventData
  *
  *  @return YES if the report should be sent
  */
-typedef bool (^BugsnagBeforeSendBlock)(NSDictionary *_Nonnull rawEventData,
-                                       BugsnagCrashReport *_Nonnull reports);
+typedef bool (^BugsnagOnSendBlock)(NSDictionary *_Nonnull rawEventData,
+                                       BugsnagEvent *_Nonnull reports);
 
 /**
  * A configuration block for modifying a session. Intended for internal usage only.
  *
  * @param sessionPayload The session about to be delivered
  */
-typedef void(^BeforeSendSession)(NSMutableDictionary *_Nonnull sessionPayload);
+typedef void(^BugsnagOnSessionBlock)(NSMutableDictionary *_Nonnull sessionPayload);
 
 /**
  *  A handler for modifying data before sending it to Bugsnag
  *
  *  @param rawEventReports The raw event data written at crash time. This
- *                         includes data added in onCrashHandler.
+ *                         includes data added in onError.
  *  @param report          The default report payload
  *
  *  @return the report payload intended to be sent or nil to cancel sending
@@ -76,10 +84,11 @@ typedef NSDictionary *_Nullable (^BugsnagBeforeNotifyHook)(
     NSArray *_Nonnull rawEventReports, NSDictionary *_Nonnull report);
 
 @interface BugsnagConfiguration : NSObject
+
 /**
  *  The API key of a Bugsnag project
  */
-@property(readwrite, retain, nullable) NSString *apiKey;
+@property(readwrite, retain, nonnull) NSString *apiKey;
 /**
  *  The release stage of the application, such as production, development, beta
  *  et cetera
@@ -112,11 +121,11 @@ typedef NSDictionary *_Nullable (^BugsnagBeforeNotifyHook)(
  *  Additional information about the state of the app or environment at the
  *  time the report was generated
  */
-@property(readwrite, retain, nullable) BugsnagMetaData *metaData;
+@property(readwrite, retain, nullable) BugsnagMetadata *metadata;
 /**
  *  Meta-information about the state of Bugsnag
  */
-@property(readwrite, retain, nullable) BugsnagMetaData *config;
+@property(readwrite, retain, nullable) BugsnagMetadata *config;
 /**
  *  Rolling snapshots of user actions leading up to a crash report
  */
@@ -132,18 +141,18 @@ BugsnagBreadcrumbs *breadcrumbs;
  *  Hooks for modifying crash reports before it is sent to Bugsnag
  */
 @property(readonly, strong, nullable)
-    NSArray<BugsnagBeforeSendBlock> *beforeSendBlocks;
+    NSArray<BugsnagOnSendBlock> *onSendBlocks;
 
 /**
  *  Hooks for modifying sessions before they are sent to Bugsnag. Intended for internal use only by React Native/Unity.
  */
 @property(readonly, strong, nullable)
-NSArray<BeforeSendSession> *beforeSendSessionBlocks;
+NSArray<BugsnagOnSessionBlock> *onSessionBlocks;
 
 /**
- *  Optional handler invoked when a crash or fatal signal occurs
+ *  Optional handler invoked when an error or crash occurs
  */
-@property void (*_Nullable onCrashHandler)
+@property void (*_Nullable onError)
     (const BSG_KSCrashReportWriter *_Nonnull writer);
 
 /**
@@ -169,7 +178,7 @@ NSArray<BeforeSendSession> *beforeSendSessionBlocks;
  * while the app is in the background. Setting this property has no effect.
  */
 @property BOOL reportBackgroundOOMs
-__deprecated_msg("This detection option is unreliable and should no longer be used.");
+    __deprecated_msg("This detection option is unreliable and should no longer be used.");
 
 /**
  * Retrieves the endpoint used to notify Bugsnag of errors
@@ -188,6 +197,19 @@ __deprecated_msg("This detection option is unreliable and should no longer be us
  * @see setEndpointsForNotify:sessions:
  */
 @property(readonly, retain, nullable) NSURL *sessionURL;
+
+/**
+ * Required declaration to suppress a superclass designated-initializer error
+ */
+- (instancetype _Nonnull )init NS_UNAVAILABLE NS_SWIFT_UNAVAILABLE("Use initWithApiKey:");
+
+/**
+ * The designated initializer.
+ */
+- (instancetype _Nullable)initWithApiKey:(NSString *_Nonnull)apiKey
+                                   error:(NSError *_Nullable *_Nullable)error
+    NS_DESIGNATED_INITIALIZER
+    NS_SWIFT_NAME(init(_:)) __attribute__((swift_error(nonnull_error)));
 
 /**
  * Set the endpoints to send data to. By default we'll send error reports to
@@ -224,19 +246,19 @@ __deprecated_msg("This detection option is unreliable and should no longer be us
  *
  *  @param block A block which returns YES if the report should be sent
  */
-- (void)addBeforeSendBlock:(BugsnagBeforeSendBlock _Nonnull)block;
+- (void)addOnSendBlock:(BugsnagOnSendBlock _Nonnull)block;
 
 /**
  *  Add a callback to be invoked before a session is sent to Bugsnag. Intended for internal usage only.
  *
  *  @param block A block which can modify the session
  */
-- (void)addBeforeSendSession:(BeforeSendSession _Nonnull)block;
+- (void)addOnSessionBlock:(BugsnagOnSessionBlock _Nonnull)block;
 
 /**
  * Clear all callbacks
  */
-- (void)clearBeforeSendBlocks;
+- (void)clearOnSendBlocks;
 
 /**
  *  Whether reports shoould be sent, based on release stage options
@@ -252,9 +274,6 @@ __deprecated_msg("This detection option is unreliable and should no longer be us
  */
 @property NSUInteger maxBreadcrumbs;
 
-- (void)addBeforeNotifyHook:(BugsnagBeforeNotifyHook _Nonnull)hook
-    __deprecated_msg("Use addBeforeSendBlock: instead.");
-
 /**
  * Determines whether app sessions should be tracked automatically. By default this value is true.
  * If this value is updated after +[Bugsnag start] is called, only subsequent automatic sessions
@@ -267,18 +286,10 @@ __deprecated_msg("This detection option is unreliable and should no longer be us
  */
 @property BOOL autoNotify __deprecated_msg("Use autoDetectErrors instead");
 
-/**
- *  Hooks for processing raw report data before it is sent to Bugsnag
- */
-@property(readonly, strong, nullable)
-    NSArray *beforeNotifyHooks __deprecated_msg("Use beforeNotify instead.");
-
 - (NSDictionary *_Nonnull)errorApiHeaders;
 - (NSDictionary *_Nonnull)sessionApiHeaders;
 
 @property(retain, nullable) NSString *codeBundleId;
 @property(retain, nullable) NSString *notifierType;
-
-- (BOOL)hasValidApiKey;
 
 @end
