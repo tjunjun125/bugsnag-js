@@ -69,6 +69,8 @@ typedef NS_ENUM(NSUInteger, BSGBreadcrumbType) {
     BSGBreadcrumbTypeUser,
 };
 
+BSGBreadcrumbType BSGBreadcrumbTypeFromString(NSString *value);
+
 @class BugsnagBreadcrumb;
 
 typedef void (^BSGBreadcrumbConfiguration)(BugsnagBreadcrumb *_Nonnull);
